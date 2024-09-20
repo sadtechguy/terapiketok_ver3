@@ -19,5 +19,9 @@ else:
     app.debug = False
     app.config['SQLALCHEMY_DATABASE_URI'] = ""
 
-print(DATABASE_PASSWORD)
-print(DATABASE_NAME)
+db = SQLAlchemy(app)
+
+from terapiketok.routes.home import home_bp
+
+app.register_blueprint(home_bp)
+
