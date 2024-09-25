@@ -6,9 +6,40 @@ Registrasi
 
 {% block content %}
 
-<main class="container bg-light">
-    <h1>Hello</h1>
-    <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sed perspiciatis unde dolorum totam sapiente ad corporis, repudiandae voluptas nam harum.</p>
+<main class="container bg-light" style="min-height: 100vh;">
+    <h1>Terapi ketok Mr. KEVIN</h1>
+    <address class="text-center">
+        Garden Hous Grand Wisata<br>
+        blok BG1 no.33 Lambangjaya<br>
+        Tambun Selatan<br>
+        Bekasi 17510 
+    </address>
+    
+    <div class="pb-3">
+        {% for batch in batches %}
+            <div class="card mb-3 bg-light" style="max-width: 540px; border-radius: 10px;">
+                <div class="row g-0">
+                    <!-- left side -->
+                <div class="col-md-2 bg-dark text-light d-flex flex-column justify-content-center align-items-center" style="border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                    <small>SESI</small>
+                    <h3 class="card-title" style="font-size: 36px; margin: 0;">{{ batch[2]}}</h3>
+                </div>
+                <!-- middle side -->
+                <div class="col-md-9 bg-light">
+                    <div class="card-body" style="padding: 0.5rem 1rem;">
+                    <h6 class="card-title" style="font-weight: 400; line-height: 0.9; margin: 0;">{{ batch[3]}}</h6>
+                    <p class="card-text" style="font-size: 24px; line-height: 1; margin: 5px 0">Jam: {{ batch[4]}} - {{ batch[5]}}</p>
+                    <p class="card-text" style="line-height: 0.9; "><small class="text-muted">{{ batch[1]}} - {{ batch[0]}}</small></p>
+                    </div>
+                </div>
+                <!-- right side -->
+                <div class="col-md-1 d-flex justify-content-center align-items-center bg-{{batch[7]}} text-light" style="border-top-right-radius: 10px; border-bottom-right-radius: 10px;">
+                    <span style="transform: rotate(-90deg);">{{ batch[6] }}</span>
+                </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </main>
 
 {% endblock %}
