@@ -15,7 +15,11 @@ def fetch_available_batch():
         with psycopg2.connect(conn_string) as conn:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT * FROM batches
+                    SELECT batch_date, day_name_ina, schedule_id, schedule_name, 
+                        start_time, end_time, max_tickets, current_tickets, status 
+                            FROM batches 
+                            JOIN workingdays USING (day_id)
+                            JOIN schedule USING (schedule_id)
                 """)
                 rows = cur.fetchall()
                 return rows
