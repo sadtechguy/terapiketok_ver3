@@ -24,3 +24,11 @@ body:before {
       opacity: 1;
     }
   }
+
+  a {
+    color: black
+  }
+
+a:hover {
+  color: inherit; /* Inherit the color from the parent element */
+}
