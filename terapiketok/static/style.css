@@ -32,3 +32,11 @@ body:before {
 a:hover {
   color: inherit; /* Inherit the color from the parent element */
 }
+
+.black-transparent {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.white-transparent {
+  background-color: rgba(200, 200, 200, 0.7);
+}
