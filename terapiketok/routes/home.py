@@ -1,12 +1,33 @@
 import datetime
-from flask import Blueprint, render_template_string, render_template
+from flask import Blueprint, render_template_string, render_template, request, redirect, url_for
 from ..services.database import fetch_available_batch
+from ..services.data_processing import authenticate_user
 
 home_bp = Blueprint('home', __name__, template_folder="../templates/home")
 
 @home_bp.route('/')
-@home_bp.route('/home')
+@home_bp.route('/home', methods=['GET', 'POST'])
 def home_page():
+    text_header = "Harap masukkan nama dan nomor HP"
+
+    if request.method == 'POST':
+        username = request.form['username']
+        phone = request.form['phone']
+
+        if authenticate_user(username, phone):
+            # Redirect to the home page after successful login
+            return redirect(url_for('.register_page', username=username, phone=phone))
+    return render_template('home.html', text_header=text_header)
+
+@home_bp.route('/register')
+def register_page():
+    username = request.args.get('username')
+    phone = request.args.get('phone')
+
+    if authenticate_user(username, phone) == False:
+        return redirect(url_for('.home_page'))
+
+    text_header = f"Selamat datang, {username}"
     batches = fetch_available_batch()
     clean_batches = []
     for batch in batches:
@@ -27,4 +48,4 @@ def home_page():
               left_side_class, middle_side_class, right_side_class)
         )
 
-    return render_template('home.html', batches=clean_batches)
+    return render_template('register.html', batches=clean_batches, text_header=text_header)
