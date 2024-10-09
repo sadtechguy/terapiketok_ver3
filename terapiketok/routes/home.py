@@ -2,6 +2,7 @@ import datetime
 from flask import Blueprint, render_template_string, render_template, request, redirect, url_for
 from ..services.database import fetch_available_batch
 from ..services.data_processing import authenticate_user
+from ..forms import LoginForm
 
 home_bp = Blueprint('home', __name__, template_folder="../templates/home")
 
@@ -9,15 +10,19 @@ home_bp = Blueprint('home', __name__, template_folder="../templates/home")
 @home_bp.route('/home', methods=['GET', 'POST'])
 def home_page():
     text_header = "Harap masukkan nama dan nomor HP"
+    form = LoginForm()
 
-    if request.method == 'POST':
-        username = request.form['username']
-        phone = request.form['phone']
+    if form.validate_on_submit():
+        # username = request.form['username']
+        # phone = request.form['phone']
+
+        username = form.username.data
+        phone = form.phone.data
 
         if authenticate_user(username, phone):
             # Redirect to the home page after successful login
             return redirect(url_for('.register_page', username=username, phone=phone))
-    return render_template('home.html', text_header=text_header)
+    return render_template('home.html', form=form, text_header=text_header)
 
 @home_bp.route('/register')
 def register_page():

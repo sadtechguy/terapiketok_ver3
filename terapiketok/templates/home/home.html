@@ -14,16 +14,20 @@
             Bekasi 17510 
         </address>
     </div>
-    <form method="POST" action="{{ url_for('home.home_page') }}">
-        <div class="form-group"></div>
-            <label for="username">Name:</label>
-            <input type="text" class="form-control" id="username" name="username" required>
-        </div>
-        <div class="form-group">
-            <label for="password">HP:</label>
-            <input type="password" class="form-control" id="phone" name="phone" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
+    <div class="mx-4 p-2">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.username.label() }}
+                {{ form.username(class="form-control", placeholder="Nama") }}
+            </div>
+    
+            <div class="mb-3">
+                {{ form.phone.label() }}
+                {{ form.phone(class="form-control", placeholder="Nomer HP") }}
+            </div>
+            {{ form.submit(class="form-control btn btn-success") }}
+        </form>
+    </div>
 </main>
 {% endblock %}
