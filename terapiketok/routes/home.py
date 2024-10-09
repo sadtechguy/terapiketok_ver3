@@ -13,9 +13,6 @@ def home_page():
     form = LoginForm()
 
     if form.validate_on_submit():
-        # username = request.form['username']
-        # phone = request.form['phone']
-
         username = form.username.data
         phone = form.phone.data
 
@@ -42,8 +39,8 @@ def register_page():
         batch_day = batch[1]
         schedule_id = batch[2]
         schedule_name = batch[3]
-        start_hour = batch[4]
-        end_hour = batch[5]
+        start_hour = batch[4].strftime('%H:%M')
+        end_hour = batch[5].strftime('%H:%M')
         status = batch[8]
 
         classes = {

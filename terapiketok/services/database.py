@@ -20,6 +20,7 @@ def fetch_available_batch():
                             FROM batches 
                             JOIN workingdays USING (day_id)
                             JOIN schedule USING (schedule_id)
+                            ORDER BY batch_date, schedule_id
                 """)
                 rows = cur.fetchall()
                 return rows
