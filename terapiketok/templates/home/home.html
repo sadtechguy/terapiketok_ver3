@@ -6,19 +6,21 @@ Registrasi
 
 {% block content %}
 
-<main class="container bg-light" style="min-height: 100vh;">
-    <header class="text-center">
-        <h1>Terapi ketok</h1>
-        <h2>Mr. KEVIN</h2>
-    </header>
-    <address class="text-center">
-        Garden Hous Grand Wisata<br>
-        blok BG1 no.33 Lambangjaya<br>
-        Tambun Selatan<br>
-        Bekasi 17510 
-    </address>
+<main class="container bg-light p-0" style="min-height: 100vh;">
+    <div class="heroSection">
+        <header class="text-center">
+            <h1>TERAPI KETOK</h1>
+            <h2>Mr. KEVIN</h2>
+        </header>
+        <address class="text-center">
+            Garden Hous Grand Wisata<br>
+            blok BG1 no.33 Lambangjaya<br>
+            Tambun Selatan<br>
+            Bekasi 17510 
+        </address>
+    </div>
     
-    <div class="pb-3">
+    <div class="pb-3 mx-3">
         {% for batch in batches %}
         <a href="#" style="display: block; text-decoration: none;">
             <div class="card mb-3" style="max-width: 540px; border-radius: 10px;">

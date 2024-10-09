@@ -17,7 +17,7 @@ def home_page():
         end_hour = batch[5]
         status = batch[8]
 
-        left_side_class = "bg-dark" if status == "OPEN" else "black-transparent"
+        left_side_class = "bgActive" if status == "OPEN" else "bgNonActive"
         middle_side_class = "text-dark" if status =="OPEN" else "white-transparent"
         right_side_class = "success" if status == "OPEN" else "danger"
 
