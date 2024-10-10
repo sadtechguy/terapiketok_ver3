@@ -1,4 +1,4 @@
-import psycopg2, os
+import psycopg2, os, datetime
 
 from dotenv import load_dotenv
 
@@ -27,3 +27,35 @@ def fetch_available_batch():
     except (psycopg2.Error, ValueError) as e:
         raise Exception(f"Error fetching the data")
     return []
+
+def create_booking(batch_id, username, phone, appointment_date, ticket_uid):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute("BEGIN TRANSACTION;")
+                cur.execute("SELECT * FROM Batches WHERE batch_id = %s FOR UPDATE;", (batch_id,))
+                batch = cur.fetchone()
+
+                if batch[7] >= batch[6]:
+                    conn.rollback()
+                    return "Batch is full"
+                
+                # Check if the phone number has already booked a ticket for the batch's date
+                cur.execute("SELECT COUNT(*) FROM booking_tickets WHERE phone=%s AND appointment_date=%s", (phone, appointment_date))
+                existing_booking_count = cur.fetchone()[0]
+
+                if existing_booking_count > 1:
+                    conn.rollback()
+                    return "No HP ini sudah tidak bisa booking lagi hari ini"
+                
+                cur.execute("UPDATE Batches SET current_tickets = current_tickets + 1 WHERE batch_id=%s", (batch_id,))
+                
+                # Insert booking data into the booking_tickets table
+                cur.execute("INSERT INTO booking_tickets (ticket_uid, batch_id, appointment_date, customer_name, phone) VALUES (%s,%s,%s,%s, %s)", (ticket_uid, batch_id, appointment_date, username, phone))
+                cur.execute("COMMIT")
+
+                return "Booking created succesfully"
+
+    except (psycopg2.Error, ValueError) as e:
+        raise Exception(f"Error fetching the data")
+        return "Failed to create booking"

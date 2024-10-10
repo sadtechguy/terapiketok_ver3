@@ -1,8 +1,8 @@
-import datetime
-from flask import Blueprint, render_template_string, render_template, request, redirect, url_for, session
-from ..services.database import fetch_available_batch
+import datetime, uuid
+from flask import Blueprint, render_template_string, render_template, request, redirect, url_for, session, flash
+from ..services.database import fetch_available_batch, create_booking
 from ..services.data_processing import authenticate_user
-from ..forms import LoginForm
+from ..forms import LoginForm, ConfirmationForm
 from ..models import Batches
 
 home_bp = Blueprint('home', __name__, template_folder="../templates/home")
@@ -67,4 +67,15 @@ def confirmation_page(batch_id):
     
     if batch is None:
          return redirect(url_for('.register_page'))
-    return render_template('confirmation.html', batch=batch, username=username, phone=phone)
+    
+    form = ConfirmationForm()
+
+    if form.validate_on_submit():
+        appointment_date = batch.batch_date
+        # Version 4 (randomly generated)
+        ticket_uid = uuid.uuid4()
+        status = create_booking(batch_id, username, phone, appointment_date, ticket_uid)
+        flash(status, category="success")
+
+    
+    return render_template('confirmation.html', batch=batch, username=username, phone=phone, form=form)

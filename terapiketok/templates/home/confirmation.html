@@ -13,8 +13,11 @@
             <li class="list-group-item mb-3">Jam: <b>{{ batch.start_time.strftime('%H:%M') }} - {{ batch.end_time.strftime('%H:%M') }}</b></li>
         </ul>
         <div class="d-flex gap-1 justify-content-center">
-            <button type="button" class="btn btn-danger p-2" style="width: 30%;">NO</button>
-            <button type="button" class="btn btn-success p-2 flex-fill">YES</button>
+            <a href="{{ url_for('home.register_page') }}"><button class="btn btn-danger p-2" style="min-width: 30%;">NO</button></a>
+            <form method="POST" class="flex-fill">
+                {{ form.hidden_tag() }}
+                {{ form.submit(class="btn btn-success form-control p-2") }}
+            </form>
         </div>
     </div>
 

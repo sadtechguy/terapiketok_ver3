@@ -7,3 +7,7 @@ class LoginForm(FlaskForm):
     phone = StringField(label='Nomer HP', validators=[DataRequired()])
     submit = SubmitField(label='Login')
 
+class ConfirmationForm(FlaskForm):
+    submit = SubmitField(label='YES')
+
+
