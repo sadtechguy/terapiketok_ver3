@@ -3,6 +3,7 @@ from flask import Blueprint, render_template_string, render_template, request, r
 from ..services.database import fetch_available_batch
 from ..services.data_processing import authenticate_user
 from ..forms import LoginForm
+from ..models import Batches
 
 home_bp = Blueprint('home', __name__, template_folder="../templates/home")
 
@@ -55,3 +56,15 @@ def register_page():
         )
 
     return render_template('register.html', batches=clean_batches, text_header=text_header)
+
+
+@home_bp.route('/confirmation/<int:batch_id>', methods=['GET', 'POST'])
+def confirmation_page(batch_id):
+    username = session.get("username")
+    phone = session.get("phone")
+    
+    batch = Batches.query.get(batch_id)
+    
+    if batch is None:
+         return redirect(url_for('.register_page'))
+    return render_template('confirmation.html', batch=batch, username=username, phone=phone)

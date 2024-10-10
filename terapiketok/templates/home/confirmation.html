@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main class="container bg-light d-flex justify-content-center align-items-center p-2" style="min-height: 100vh;">
+    <div class="card p-2" style="min-width: 200px;">
+        <h2 style="font-size: 1.2rem;">Check apakah sudah benar</h2>
+        <ul class="list-group list-group-flush" style="font-size: 0.9rem;">
+            <li class="list-group-item">Nama: <b>{{ username }}</b></li>
+            <li class="list-group-item">No. HP: <b>{{ phone }}</b></li>
+            <li class="list-group-item">Hari: <b>{{ batch.workingdays.day_name_ina }}</b></li>
+            <li class="list-group-item">Tgl Booking: <b>{{ batch.batch_date.strftime('%d-%B-%Y')}}</b></li>
+            <li class="list-group-item">Sesi: <b>{{ batch.schedule_id}}</b></li>
+            <li class="list-group-item mb-3">Jam: <b>{{ batch.start_time.strftime('%H:%M') }} - {{ batch.end_time.strftime('%H:%M') }}</b></li>
+        </ul>
+        <div class="d-flex gap-1 justify-content-center">
+            <button type="button" class="btn btn-danger p-2" style="width: 30%;">NO</button>
+            <button type="button" class="btn btn-success p-2 flex-fill">YES</button>
+        </div>
+    </div>
+
+</main>
+{% endblock %}
