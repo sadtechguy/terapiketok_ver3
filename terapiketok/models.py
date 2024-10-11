@@ -1,3 +1,4 @@
+import datetime
 from terapiketok import db
 
 class Batches(db.Model):
@@ -22,4 +23,10 @@ class Schedule(db.Model):
 class Workingdays(db.Model):
     day_id = db.Column(db.String(2), primary_key=True)
     day_name_ina = db.Column(db.String(7))
+class Booking_tickets(db.Model):
+    ticket_uid = db.Column(db.UUID, primary_key=True)
+    batch_id = db.Column(db.Integer, db.ForeignKey('batches.batch_id'))
+    customer_name = db.Column(db.String(50))
+    phone = db.Column(db.String(30))
+    created_at = db.Column(db.DateTime)
 

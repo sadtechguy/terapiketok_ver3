@@ -3,7 +3,7 @@ from flask import Blueprint, render_template_string, render_template, request, r
 from ..services.database import fetch_available_batch, create_booking
 from ..services.data_processing import authenticate_user
 from ..forms import LoginForm, ConfirmationForm
-from ..models import Batches
+from ..models import Batches, Booking_tickets
 
 home_bp = Blueprint('home', __name__, template_folder="../templates/home")
 
@@ -74,8 +74,26 @@ def confirmation_page(batch_id):
         appointment_date = batch.batch_date
         # Version 4 (randomly generated)
         ticket_uid = uuid.uuid4()
-        status = create_booking(batch_id, username, phone, appointment_date, ticket_uid)
-        flash(status, category="success")
-
+        status, message = create_booking(batch_id, username, phone, appointment_date, ticket_uid)
+        if status:
+            session["ticket"] = ticket_uid
+            flash(message, category="success")
+            return redirect(url_for('.ticket_page'))
+        else:
+            flash(message, category="danger")
+            return redirect(url_for('.register_page'))
     
     return render_template('confirmation.html', batch=batch, username=username, phone=phone, form=form)
+
+@home_bp.route('/ticket')
+def ticket_page():
+    ticket_uid = session.get("ticket")
+    if ticket_uid:
+        ticket = Booking_tickets.query.get(ticket_uid)
+        print(ticket)
+    else:
+        flash(f"Tidak dapat Tiket. Mohon maaf", category="danger")
+        return redirect(url_for(".register_page"))
+    return render_template('ticket.html', ticket=ticket)
+
+
