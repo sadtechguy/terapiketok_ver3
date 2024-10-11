@@ -2,19 +2,35 @@
 
 {% block content %}
 <main class="container bg-light d-flex justify-content-center align-items-center p-2" style="min-height: 100vh;">
-    <div class="card p-2" style="min-width: 200px;">
+    <div class="card shadow p-3 mb-5 bg-body rounded" style="min-width: 200px;">
         <div>
-            <h2>{{ ticket.customer_name }}</h2>
+            <h2 class="text-center">{{ ticket.customer_name }}</h2>
             <div  class="d-flex justify-content-between align-items-center">
-                <div>Booking No:</div>
-                <small>{{ ticket.ticket_uid }}</small>
+                <div>No HP</div>
+                <div>{{ ticket.phone }}</div>
+            </div>
+            <div  class="d-flex justify-content-between align-items-center">
+                <div>Tanggal</div>
+                <div>{{ ticket.batches.batch_date.strftime('%d-%B-%Y') }}</div>
+            </div>
+            <div  class="d-flex justify-content-between align-items-center">
+                <div>Sesi</div>
+                <div>{{ ticket.batches.schedule_id }}</div>
+            </div>
+            <div  class="d-flex justify-content-between align-items-center">
+                <div>Jam</div>
+                <div>{{ ticket.batches.start_time.strftime('%H:%M') }} - {{ ticket.batches.end_time.strftime('%H:%M') }}</div>
+            </div>
+            <div  class="d-flex flex-column justify-content-between align-items-center">
+                <div style="color: gray;">No urut</div>
+                <div style="color: gray; font-size:xx-large;">{{ queue_number }}</div>
+            </div>
+            <div  class="d-flex flex-column justify-content-between align-items-center">
+                <div style="color: gray; font-size: x-small;">Booking Code</div>
+                <div style="color: gray; font-size: x-small;">{{ ticket.ticket_uid }}</div>
             </div>
 
-            
         </div>
-        <h1>ticket</h1>
-        {{ ticket.batch_id }}
-        {{ ticket.phone }}
     </div>
 
 </main>

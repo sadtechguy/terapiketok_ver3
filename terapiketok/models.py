@@ -30,3 +30,7 @@ class Booking_tickets(db.Model):
     phone = db.Column(db.String(30))
     created_at = db.Column(db.DateTime)
 
+    # Relationship with the schedule table
+    batches = db.relationship('Batches', backref='booking_tickets')
+
+

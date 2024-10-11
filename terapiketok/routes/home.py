@@ -1,6 +1,6 @@
 import datetime, uuid
 from flask import Blueprint, render_template_string, render_template, request, redirect, url_for, session, flash
-from ..services.database import fetch_available_batch, create_booking
+from ..services.database import fetch_available_batch, create_booking, fetct_queue_number
 from ..services.data_processing import authenticate_user
 from ..forms import LoginForm, ConfirmationForm
 from ..models import Batches, Booking_tickets
@@ -72,6 +72,7 @@ def confirmation_page(batch_id):
 
     if form.validate_on_submit():
         appointment_date = batch.batch_date
+        
         # Version 4 (randomly generated)
         ticket_uid = uuid.uuid4()
         status, message = create_booking(batch_id, username, phone, appointment_date, ticket_uid)
@@ -90,10 +91,10 @@ def ticket_page():
     ticket_uid = session.get("ticket")
     if ticket_uid:
         ticket = Booking_tickets.query.get(ticket_uid)
-        print(ticket)
+        queue_number = fetct_queue_number(ticket.batch_id, ticket_uid)
     else:
         flash(f"Tidak dapat Tiket. Mohon maaf", category="danger")
         return redirect(url_for(".register_page"))
-    return render_template('ticket.html', ticket=ticket)
+    return render_template('ticket.html', ticket=ticket, queue_number=queue_number)
 
 
