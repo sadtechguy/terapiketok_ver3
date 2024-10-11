@@ -10,7 +10,7 @@ DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 
 conn_string = f"dbname={DATABASE_NAME} user={DATABASE_USER} password={DATABASE_PASSWORD}"
 
-def fetch_available_batch():
+def fetch_available_batch(start_date):
     try:
         with psycopg2.connect(conn_string) as conn:
             with conn.cursor() as cur:
@@ -20,8 +20,9 @@ def fetch_available_batch():
                             FROM batches 
                             JOIN workingdays USING (day_id)
                             JOIN schedule USING (schedule_id)
+                            WHERE batch_date >= %s
                             ORDER BY batch_date, schedule_id
-                """)
+                """,(start_date,))
                 rows = cur.fetchall()
                 return rows
     except (psycopg2.Error, ValueError) as e:

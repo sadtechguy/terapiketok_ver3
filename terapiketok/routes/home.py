@@ -33,7 +33,10 @@ def register_page():
         return redirect(url_for('.home_page'))
 
     text_header = f"Selamat datang, {username}"
-    batches = fetch_available_batch()
+    today = datetime.date.today()
+    tomorrow = today + datetime.timedelta(days=1)
+    
+    batches = fetch_available_batch(tomorrow)
     clean_batches = []
     for batch in batches:
         batch_date = batch[0].strftime('%d-%m-%Y')
