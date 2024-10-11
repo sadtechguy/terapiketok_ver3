@@ -21,7 +21,7 @@
                 <div>Jam</div>
                 <div>{{ ticket.batches.start_time.strftime('%H:%M') }} - {{ ticket.batches.end_time.strftime('%H:%M') }}</div>
             </div>
-            <div  class="d-flex flex-column justify-content-between align-items-center">
+            <div  class="d-flex flex-column justify-content-between align-items-center my-3">
                 <div style="color: gray;">No urut</div>
                 <div style="color: gray; font-size:xx-large;">{{ queue_number }}</div>
             </div>
@@ -29,7 +29,10 @@
                 <div style="color: gray; font-size: x-small;">Booking Code</div>
                 <div style="color: gray; font-size: x-small;">{{ ticket.ticket_uid }}</div>
             </div>
-
+            <form method="POST" class="flex-fill mt-2">
+                {{ form.hidden_tag() }}
+                {{ form.submit(class="btn btn-info form-control p-2") }}
+            </form>
         </div>
     </div>
 

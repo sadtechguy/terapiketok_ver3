@@ -64,20 +64,20 @@ def create_booking(batch_id, username, phone, appointment_date, ticket_uid):
         raise Exception(f"Unknown error: {e}")
     return False, "Failed to create booking"
 
-def fetct_queue_number(batch_id, ticket_uid):
+def fetct_queue_number(batch_id):
     try:
         with psycopg2.connect(conn_string) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT ROW_NUMBER() OVER (PARTITION BY batch_id ORDER BY created_at ASC) AS queue_number FROM booking_tickets WHERE batch_id=%s AND ticket_uid=%s", (batch_id, ticket_uid))
+                cur.execute("SELECT ROW_NUMBER() OVER (PARTITION BY batch_id ORDER BY created_at ASC) AS queue_number, ticket_uid FROM booking_tickets WHERE batch_id=%s", (batch_id,))
 
-                queue_number = cur.fetchone()
+                queue_number = cur.fetchall()
                 if queue_number:
-                    return queue_number[0]
+                    return queue_number
                 else:
-                    return None
+                    return []
     
     except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
         print(f"Error connecting to database: {e}")  # Print the original error
         raise Exception(f"Error fetching queue number: {e}")
-    return None
+    return []
 

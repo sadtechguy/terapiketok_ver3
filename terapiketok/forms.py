@@ -10,4 +10,7 @@ class LoginForm(FlaskForm):
 class ConfirmationForm(FlaskForm):
     submit = SubmitField(label='YES')
 
+class CloseTicketButton(FlaskForm):
+    submit = SubmitField(label='CLOSE')
+
 

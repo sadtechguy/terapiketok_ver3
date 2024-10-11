@@ -1,8 +1,8 @@
 import datetime, uuid
 from flask import Blueprint, render_template_string, render_template, request, redirect, url_for, session, flash
 from ..services.database import fetch_available_batch, create_booking, fetct_queue_number
-from ..services.data_processing import authenticate_user
-from ..forms import LoginForm, ConfirmationForm
+from ..services.data_processing import authenticate_user, get_queue_number
+from ..forms import LoginForm, ConfirmationForm, CloseTicketButton
 from ..models import Batches, Booking_tickets
 
 home_bp = Blueprint('home', __name__, template_folder="../templates/home")
@@ -86,15 +86,22 @@ def confirmation_page(batch_id):
     
     return render_template('confirmation.html', batch=batch, username=username, phone=phone, form=form)
 
-@home_bp.route('/ticket')
+@home_bp.route('/ticket', methods=['GET', 'POST'])
 def ticket_page():
+    form = CloseTicketButton()
+    if form.validate_on_submit():
+        return redirect(url_for('.register_page'))
+    
     ticket_uid = session.get("ticket")
     if ticket_uid:
         ticket = Booking_tickets.query.get(ticket_uid)
-        queue_number = fetct_queue_number(ticket.batch_id, ticket_uid)
+        list_queue = fetct_queue_number(ticket.batch_id)
+        queue_number = get_queue_number(list_queue, ticket_uid)
+        if queue_number == -1:
+            queue_number = "XX"
     else:
         flash(f"Tidak dapat Tiket. Mohon maaf", category="danger")
         return redirect(url_for(".register_page"))
-    return render_template('ticket.html', ticket=ticket, queue_number=queue_number)
+    return render_template('ticket.html', ticket=ticket, queue_number=queue_number, form=form)
 
 
