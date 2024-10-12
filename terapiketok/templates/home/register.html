@@ -23,7 +23,7 @@ Registrasi
     <div class="pb-3 mx-3">
         {% for batch in batches %}
             {% if batch[6].upper() == "OPEN" %}
-                <a href="{{ url_for('home.confirmation_page', batch_id=batch[2]) }}" style="display: block; text-decoration: none;" {{ 'disabled' if batch[6] != 'OPEN' else '' }}>
+                <a href="{{ url_for('home.confirmation_page', batch_id=batch[2]) }}" style="display: block; text-decoration: none;">
                     <div class="card mb-3" style="max-width: 540px; border-radius: 10px;">
                         <div class="row g-0">
                             <!-- left side -->

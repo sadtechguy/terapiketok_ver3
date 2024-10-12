@@ -22,6 +22,8 @@ else:
 db = SQLAlchemy(app)
 
 from terapiketok.routes.home import home_bp
+from terapiketok.routes.boardpanel import boardpanel_bp
 
 app.register_blueprint(home_bp)
+app.register_blueprint(boardpanel_bp)
 
