@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main class="container bg-light p-0" style="min-height: 100vh;">
+    <div class="p-3">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="row p-2">
+                {{ form.username(class="form-control mb-1") }}
+                {{ form.password(class="form-control mb-1") }}
+                {{ form.confirm_password(class="form-control mb-1") }}
+                {{ form.submit(class="btn btn-success") }}
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

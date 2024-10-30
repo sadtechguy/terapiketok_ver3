@@ -29,6 +29,23 @@ def fetch_available_batch(start_date):
         raise Exception(f"Error fetching the data")
     return []
 
+def fetct_queue_number(batch_id):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT ROW_NUMBER() OVER (PARTITION BY batch_id ORDER BY created_at ASC) AS queue_number, ticket_uid FROM booking_tickets WHERE batch_id=%s", (batch_id,))
+
+                queue_number = cur.fetchall()
+                if queue_number:
+                    return queue_number
+                else:
+                    return []
+    
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        print(f"Error connecting to database: {e}")  # Print the original error
+        raise Exception(f"Error fetching queue number: {e}")
+    return []
+
 def create_booking(batch_id, username, phone, appointment_date, ticket_uid):
     try:
         with psycopg2.connect(conn_string) as conn:
@@ -65,20 +82,26 @@ def create_booking(batch_id, username, phone, appointment_date, ticket_uid):
         raise Exception(f"Unknown error: {e}")
     return False, "Failed to create booking"
 
-def fetct_queue_number(batch_id):
+def add_new_admin(username, hashed_password):
+    count = 0
     try:
         with psycopg2.connect(conn_string) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT ROW_NUMBER() OVER (PARTITION BY batch_id ORDER BY created_at ASC) AS queue_number, ticket_uid FROM booking_tickets WHERE batch_id=%s", (batch_id,))
+                cur.execute("""
+                    INSERT INTO adminuser (username, hashed_password)
+                    VALUES (%s, %s)
+                """, (username, hashed_password))
 
-                queue_number = cur.fetchall()
-                if queue_number:
-                    return queue_number
-                else:
-                    return []
+                conn.commit()
+                count = cur.rowcount
+                
     
-    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
-        print(f"Error connecting to database: {e}")  # Print the original error
-        raise Exception(f"Error fetching queue number: {e}")
-    return []
+    except psycopg2.OperationalError as e:
+        raise Exception(f"Database error: {e}")
+    except psycopg2.ProgrammingError as e:
+        raise Exception(f"Invalid SQL query: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    
+    return count
 

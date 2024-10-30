@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 
 app = Flask(__name__)
@@ -20,6 +21,7 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = ""
 
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 
 from terapiketok.routes.home import home_bp
 from terapiketok.routes.boardpanel import boardpanel_bp
