@@ -13,7 +13,7 @@
 <body>
     <nav class="navbar navbar-dark bg-success">
         <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">{{ text_header }}</span>
+            <span class="navbar-brand mb-0 h1"><a href={{ url_for('boardpanel.boardpanel_page') }} style="text-decoration: none;"><i class="fa-solid fa-caret-left"></i>back</a></span>
         </div>
     </nav>
     {% with messages = get_flashed_messages(with_categories=true) %}

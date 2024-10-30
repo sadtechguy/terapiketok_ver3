@@ -1,4 +1,5 @@
 import datetime
+from flask_login import UserMixin
 from terapiketok import db
 
 class Batches(db.Model):
@@ -32,5 +33,10 @@ class Booking_tickets(db.Model):
 
     # Relationship with the schedule table
     batches = db.relationship('Batches', backref='booking_tickets')
+
+class Adminuser(db.Model, UserMixin):
+    user_id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), nullable=False, unique=True)
+    hashed_password = db.Column(db.String(80), nullable=False)
 
 
