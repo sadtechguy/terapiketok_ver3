@@ -40,16 +40,14 @@ def adminregister_page():
         confirm_password = form.confirm_password.data
         if password == confirm_password:
             hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-            added_user_count = add_new_admin(username, hashed_password)
-            # new_user = Adminuser(username=username, hashed_password=hashed_password)
-            # db.session.add(new_user)
-            # db.session.commit()
-
-            if added_user_count == 1:
+            new_user = Adminuser(username=username, hashed_password=hashed_password)
+            try:
+                db.session.add(new_user)
+                db.session.commit()
                 flash("Registration successful!", category="success")
                 return redirect(url_for("boardpanel.adminlogin_page"))
-            else:
-                flash("An error occurred during registration. Please try again.", category="danger")
+            except Exception as e:
+                flash("Registration failed", category="danger")
         else:
             flash("password not match", category="danger")
     
