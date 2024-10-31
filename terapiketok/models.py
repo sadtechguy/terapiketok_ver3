@@ -37,6 +37,10 @@ class Booking_tickets(db.Model):
 class Adminuser(db.Model, UserMixin):
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
-    hashed_password = db.Column(db.String(200), nullable=False)
+    hashed_password = db.Column(db.String(128), nullable=False)
+
+    def get_id(self):
+        return str(self.user_id)  # Use the user_id field as the unique identifier
+
 
 
