@@ -16,6 +16,8 @@ ENV = os.getenv("ENV")
 if ENV == "DEV":
     app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql+psycopg2://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:5432/{DATABASE_NAME}"
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+    app.config["SESSION_PERMANENT"] = True
+    app.config["PERMANENT_SESSION_LIFETIME"] = 60
 else:
     app.debug = False
     app.config['SQLALCHEMY_DATABASE_URI'] = ""

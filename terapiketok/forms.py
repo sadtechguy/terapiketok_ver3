@@ -30,4 +30,9 @@ class LoginAdminForm(FlaskForm):
     password = PasswordField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Password"})
     submit = SubmitField("Login")
 
-
+class DefaultBatchForm(FlaskForm):
+    capacity = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "capacity/shift"})
+    limit = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "booking limit"})
+    num_batches = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "jumlah shift"})
+    schedules = StringField()
+    submit = SubmitField("SUBMIT")

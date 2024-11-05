@@ -18,16 +18,12 @@ login_manager.login_view = "boardpanel.adminlogin_page"
 def load_user(user_id):
     return Adminuser.query.get(int(user_id))
 
-@boardpanel_bp.route('/boardpanel', methods=['GET', 'POST'])
-@login_required
-def boardpanel_page():
-    text_header = "DASHBOARD"
-    return render_template('boardpanel.html', text_header=text_header)
-
-@boardpanel_bp.route('/batches')
-def batch_page():
-    text_header = "Available Batches"
-    return render_template('batches.html', text_header=text_header)
+@boardpanel_bp.before_request
+def before_request():
+    if current_user.is_authenticated:
+        session.permanent = True  # Ensure session cookie is permanent
+        db.session.refresh(current_user)  # Refresh user object from database
+        session['user_id'] = current_user.user_id  # Update session data
 
 @boardpanel_bp.route('/adminregister', methods=['GET', 'POST'])
 def adminregister_page():
@@ -77,4 +73,27 @@ def adminlogin_page():
 @login_required
 def logout_page():
     logout_user()
+    session.clear() # clear all session
     return redirect(url_for("boardpanel.adminlogin_page"))
+
+@boardpanel_bp.route('/boardpanel', methods=['GET', 'POST'])
+@login_required
+def boardpanel_page():
+    text_header = "DASHBOARD"
+    return render_template('boardpanel.html', text_header=text_header)
+
+@boardpanel_bp.route('/batches')
+def batch_page():
+    text_header = "Available Batches"
+    return render_template('batches.html', text_header=text_header)
+
+@boardpanel_bp.route('/newdate', methods=['GET', 'POST'])
+@login_required
+def newdate_page():
+    text_header = "create new date"
+    return render_template('newdate.html', text_header=text_header)
+
+@boardpanel_bp.route('/default', methods=['GET', 'POST'])
+@login_required
+def default_page():
+    return render_template('default.html')
