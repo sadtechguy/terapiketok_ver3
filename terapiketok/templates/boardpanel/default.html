@@ -1,5 +1,13 @@
 {% extends 'baseboardpanel.html' %}
 
 {% block content %}
-<h1>SETTING</h1>
+<main class="container bg-light p-0" style="min-height: 100vh;">
+    <div class="p-3">
+        <a href={{ url_for('boardpanel.batch_page') }} style="text-decoration: none;">
+            <div class="card m-1 p-3 text-center" style="border-radius: 10px;">
+                Opening Massage
+            </div>
+        </a>
+    </div>
+</main>
 {% endblock %}
