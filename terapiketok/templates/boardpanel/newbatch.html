@@ -1,0 +1,28 @@
+{% extends 'baseboardpanel.html' %}
+
+{% block content %}
+<main class="container bg-light p-0" style="min-height: 100vh;">
+    <div class="p-3">
+        <h2 class="fs-5">Open New Date</h2>
+        <div class="d-flex flex-column">
+            <div class="row">
+                <div class="col-3">
+                    Tanggal
+                </div>
+                : {{ new_date }}
+            </div>
+            <div class="row">
+                <div class="col-3">Jumlah Shift</div>
+                : {{ batches }}
+            </div>
+        </div>
+        <form method="POST" style="font-size: smaller;">
+            {{ form.hidden_tag() }}
+            <h1>NEW BATCHES</h1>
+
+            {{ form.submit(class="btn btn-success form-control p-2") }}
+        </form>
+    </div>
+</main>
+
+{% endblock %}

@@ -1,5 +1,26 @@
 {% extends 'baseboardpanel.html' %}
 
 {% block content %}
-<h1>NEW DATE</h1>
+<main class="container bg-light p-0" style="min-height: 100vh;">
+    <div class="p-3">
+        <form method="POST" style="font-size: smaller;">
+            {{ form.hidden_tag() }}
+            <div class="d-flex align-items-center">
+                <div class="mr-3">
+                    {{ form.batches.label() }}
+                </div>
+                <div class="m-3">
+                    {{ form.batches(value=batches, style="font-size: small")}}
+                </div>
+            </div>
+            <div class="mb-3">
+                {{ form.batch_date.label() }}
+                {{ form.batch_date(class="form-control", style="font-size: small", valus=new_date)}}
+            </div>
+
+            {{ form.submit(class="btn btn-success form-control p-2") }}
+        </form>
+    </div>
+</main>
+
 {% endblock %}

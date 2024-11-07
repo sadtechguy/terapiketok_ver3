@@ -3,7 +3,7 @@ from flask import Blueprint, render_template_string, render_template, request, r
 from flask_login import login_user, LoginManager, login_required, logout_user,current_user
 from flask_bcrypt import Bcrypt
 from ..models import Adminuser, Default_batch, Opening_message
-from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm, OpeningMessageForm
+from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm
 from terapiketok import app, bcrypt, db
 
 from ..services.database import add_default_batch, update_default_batch, update_opening_message
@@ -13,6 +13,7 @@ boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "boardpanel.adminlogin_page"
+login_manager.login_message_category = "info"
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -90,8 +91,35 @@ def batch_page():
 @boardpanel_bp.route('/newdate', methods=['GET', 'POST'])
 @login_required
 def newdate_page():
-    text_header = "create new date"
-    return render_template('newdate.html', text_header=text_header)
+    form = NewDateForm()
+
+    if form.validate_on_submit():
+        session["target_batch_num"] = form.batches.data
+        session["target_batch_date"] = form.batch_date.data
+        return redirect(url_for('boardpanel.newbatch_page'))
+
+    default_set = Default_batch.query.filter_by(default_batch_id=1).first()
+    batches = default_set.number_of_batches
+    new_date = datetime.date.today() + datetime.timedelta(days=1)
+    
+    return render_template('newdate.html', form=form, batches=batches, new_date=new_date)
+
+@boardpanel_bp.route('/newbatch', methods=['GET', 'POST'])
+@login_required
+def newbatch_page():
+    form = MultipleBatchesForm()
+
+    target_batch_num = session.get("target_batch_num")
+    target_batch_date_str = session.get("target_batch_date")
+    if target_batch_date_str:
+        # print(type(target_batch_date_str))
+        target_batch_date = datetime.datetime.strptime(target_batch_date_str, "%a, %d %b %Y %H:%M:%S %Z")
+        formatted_date = target_batch_date.strftime("%d-%b-%Y")
+        
+    default_set = Default_batch.query.filter_by(default_batch_id=1).first()
+    
+    
+    return render_template('newbatch.html', form=form, batches=target_batch_num, new_date=formatted_date, default_set=default_set)
 
 @boardpanel_bp.route('/default', methods=['GET', 'POST'])
 @login_required

@@ -1,7 +1,8 @@
+from datetime import date, timedelta
 from flask_wtf import FlaskForm
 from .models import Adminuser
-from wtforms import StringField, IntegerField, SubmitField, PasswordField, BooleanField, TextAreaField
-from wtforms.validators import DataRequired, InputRequired, Length, ValidationError
+from wtforms import StringField, IntegerField, SubmitField, PasswordField, BooleanField, TextAreaField, DateField, TimeField, FieldList, FormField
+from wtforms.validators import DataRequired, InputRequired, Length, ValidationError, NumberRange
 
 class LoginForm(FlaskForm):
     username = StringField(label='Nama', validators=[DataRequired()])
@@ -33,7 +34,7 @@ class LoginAdminForm(FlaskForm):
 class DefaultBatchForm(FlaskForm):
     capacity = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "capacity/shift"})
     booking_limit = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "limit per HP"})
-    number_of_batches = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "jumlah shift"})
+    number_of_batches = IntegerField(validators=[InputRequired(), NumberRange(min=1, max=10)], render_kw={"placeholder": "jumlah shift"})
     batch1 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 1"})
     batch2 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 2"})
     batch3 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 3"})
@@ -46,3 +47,18 @@ class OpeningMessageForm(FlaskForm):
     text_message = TextAreaField(validators=[Length(min=2, max=500)], render_kw={"placeholder": "write message here"})
     is_active = BooleanField('Active', default=True)
     submit = SubmitField("SUBMIT")
+
+class NewBatchForm(FlaskForm):
+    start_time = TimeField(format="%H:%M", validators=[InputRequired()])
+    end_time = TimeField(format="%H:%M", validators=[InputRequired()])
+    capacity = IntegerField(validators=[InputRequired(), NumberRange(min=1, max=40)])
+
+class MultipleBatchesForm(FlaskForm):
+    batches = FieldList(FormField(NewBatchForm), min_entries=0)
+    submit = SubmitField(label='Submit!')
+
+class NewDateForm(FlaskForm):
+    batch_date = DateField("Tanggal", format="%Y-%m-%d", validators=[InputRequired()], default=date.today() + timedelta(days=1))
+    batches = IntegerField("Jumlah Shift",validators=[InputRequired(), NumberRange(min=1, max=10)])
+    submit = SubmitField(label='Submit!')
+    
