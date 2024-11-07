@@ -85,7 +85,7 @@ address {
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
-.alert {
+.alert-temporary-disable {
   background-color: #f0ad4e;  /* Adjust the color as needed */
   color: #fff;
   padding: 10px;
@@ -99,4 +99,6 @@ address {
     margin-right: 1rem;
   }
 }
+
+
 

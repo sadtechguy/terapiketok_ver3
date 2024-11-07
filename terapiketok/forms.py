@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from .models import Adminuser
-from wtforms import StringField, IntegerField, DateField, TimeField, SubmitField, PasswordField
+from wtforms import StringField, IntegerField, SubmitField, PasswordField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, Length, ValidationError
 
 class LoginForm(FlaskForm):
@@ -40,4 +40,9 @@ class DefaultBatchForm(FlaskForm):
     batch4 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 4"})
     batch5 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 5"})
     
+    submit = SubmitField("SUBMIT")
+
+class OpeningMessageForm(FlaskForm):
+    text_message = TextAreaField(validators=[Length(min=2, max=500)], render_kw={"placeholder": "write message here"})
+    is_active = BooleanField('Active', default=True)
     submit = SubmitField("SUBMIT")

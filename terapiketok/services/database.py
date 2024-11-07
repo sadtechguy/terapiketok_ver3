@@ -162,4 +162,22 @@ def update_default_batch(capacity, booking_limit, num_batches, batch_scedules):
     except Exception as e:
         raise Exception(f"Unknown error: {e}")
     
+def update_opening_message(message, is_active):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"""
+                    UPDATE opening_message
+                    SET text_message = %s, is_active = %s
+                """, (message, is_active))
+
+                conn.commit()
+                return cur.rowcount
+                
+    
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    
 

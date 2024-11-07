@@ -41,6 +41,23 @@ class Adminuser(db.Model, UserMixin):
 
     def get_id(self):
         return str(self.user_id)  # Use the user_id field as the unique identifier
+    
+class Default_batch(db.Model):
+    default_batch_id = db.Column(db.Integer, primary_key=True)
+    capacity = db.Column(db.Integer)
+    booking_limit = db.Column(db.Integer, nullable=False)
+    number_of_batches = db.Column(db.Integer, nullable=False)
+    batch1 = db.Column(db.Integer)
+    batch2 = db.Column(db.Integer)
+    batch3 = db.Column(db.Integer)
+    batch4 = db.Column(db.Integer)
+    batch5 = db.Column(db.Integer)
+
+class Opening_message(db.Model):
+    message_id = db.Column(db.Integer, primary_key=True)
+    text_message = db.Column(db.String(500))
+    is_active = db.Column(db.Boolean, default=True)
+
 
 
 

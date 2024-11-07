@@ -8,11 +8,11 @@
             <div class="row mb-3">
                 <div class="col">
                     Capacity / batch
-                    {{ form.capacity(class="form-control", value=10, style="font-size: small") }}
+                    {{ form.capacity(class="form-control", value=default_set.capacity, style="font-size: small") }}
                 </div>
                 <div class="col">
                     Booking / HP
-                    {{ form.booking_limit(class="form-control", value=1, style="font-size: small") }}
+                    {{ form.booking_limit(class="form-control", value=default_set.booking_limit, style="font-size: small") }}
                 </div>
             </div>
             <div class="d-flex mb-3">
@@ -20,29 +20,29 @@
                     Jumlah Shift/Batch
                 </div>
                 <div class="flex-fill">
-                    {{ form.number_of_batches(class="form-control", value=5, style="font-size: small") }}
+                    {{ form.number_of_batches(class="form-control", value=default_set.number_of_batches, style="font-size: small") }}
                 </div>
             </div>
             <div class="d-flex flex-wrap mb-3">
                 <div class="col-4 adjustCol mb-3">
                     Shift 1
-                    {{ form.batch1(class="form-control", value="8:00-10:00", style="font-size: small")}}
+                    {{ form.batch1(class="form-control", value=default_set.batch1, style="font-size: small")}}
                 </div>
                 <div class="col-4 adjustCol">
                     Shift 2
-                    {{ form.batch2(class="form-control", value="11:00-13:00", style="font-size: small")}}
+                    {{ form.batch2(class="form-control", value=default_set.batch2, style="font-size: small")}}
                 </div>
                 <div class="col-4 adjustCol">
                     Shift 3
-                    {{ form.batch3(class="form-control", value="14:00-16:00", style="font-size: small")}}
+                    {{ form.batch3(class="form-control", value=default_set.batch3, style="font-size: small")}}
                 </div>
                 <div class="col-4 adjustCol">
                     Shift 4
-                    {{ form.batch4(class="form-control", value="17:00-19:00", style="font-size: small")}}
+                    {{ form.batch4(class="form-control", value=default_set.batch4, style="font-size: small")}}
                 </div>
                 <div class="col-4 adjustCol">
                     Shift 5
-                    {{ form.batch5(class="form-control", value="20:00-21:00", style="font-size: small")}}
+                    {{ form.batch5(class="form-control", value=default_set.batch5, style="font-size: small")}}
                 </div>
             </div>
             

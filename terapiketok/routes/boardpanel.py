@@ -2,11 +2,11 @@ import datetime, uuid
 from flask import Blueprint, render_template_string, render_template, request, redirect, url_for, session, flash
 from flask_login import login_user, LoginManager, login_required, logout_user,current_user
 from flask_bcrypt import Bcrypt
-from ..models import Adminuser
-from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm
+from ..models import Adminuser, Default_batch, Opening_message
+from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm, OpeningMessageForm
 from terapiketok import app, bcrypt, db
 
-from ..services.database import add_default_batch, update_default_batch
+from ..services.database import add_default_batch, update_default_batch, update_opening_message
 
 boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/boardpanel")
 
@@ -102,10 +102,39 @@ def default_page():
 @login_required
 def defaultbatch_page():
     form = DefaultBatchForm()
+
+    default_set = Default_batch.query.filter_by(default_batch_id=1).first()
     
     if form.validate_on_submit():
         schedules = [form.batch1.data, form.batch2.data, form.batch3.data, form.batch4.data, form.batch5.data]
         
         count = update_default_batch(form.capacity.data, form.booking_limit.data, form.number_of_batches.data, schedules)
-        print(count)
-    return render_template('defaultbatch.html', form=form)
+        if count > 0:
+            flash("Default updated successfully", category="success")    
+        else:
+            flash("Failed to updated", category="warning")
+            
+        return redirect(url_for("boardpanel.boardpanel_page"))
+            
+    
+    return render_template('defaultbatch.html', form=form, default_set=default_set)
+
+@boardpanel_bp.route('/defaultmessage', methods=['GET', 'POST'])
+@login_required
+def defaultmessage_page():
+    opening_message = Opening_message.query.filter_by(message_id=1).first()
+    message = {"opening": opening_message.text_message}
+    form = OpeningMessageForm(text_message=message['opening'])
+
+    
+    if form.validate_on_submit():
+        count = update_opening_message(form.text_message.data, form.is_active.data)
+        if count > 0:
+            flash("Opening message updated successfully", category="success")    
+        else:
+            flash("Failed to updated", category="warning")
+            
+        return redirect(url_for("boardpanel.boardpanel_page"))
+            
+    print(opening_message)
+    return render_template('openingmessage.html', form=form, opening_message=opening_message)

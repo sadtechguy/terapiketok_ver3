@@ -1,0 +1,25 @@
+{% extends 'baseboardpanel.html' %}
+
+{% block content %}
+<main class="container bg-light p-0" style="min-height: 100vh;">
+    <div class="p-3">
+        <form method="POST" style="font-size: smaller;">
+            {{ form.hidden_tag() }}
+            <div class="d-flex flex-column mb-3">
+
+                Opening Message
+                {{ form.text_message(class="form-control", rows=5) }}
+                <div class="form-check d-flex">
+                    <label class="form-check-label p-1" for="is_active">
+                        {{ form.is_active.label.text }}
+                    </label>
+                    {{ form.is_active()}}
+                </div>
+            </div>
+
+            {{ form.submit(class="btn btn-success form-control p-2") }}
+        </form>
+    </div>
+</main>
+
+{% endblock %}
