@@ -3,10 +3,10 @@ from flask import Blueprint, render_template_string, render_template, request, r
 from flask_login import login_user, LoginManager, login_required, logout_user,current_user
 from flask_bcrypt import Bcrypt
 from ..models import Adminuser
-from ..forms import RegisterForm, LoginAdminForm
+from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm
 from terapiketok import app, bcrypt, db
 
-from ..services.database import add_new_admin
+from ..services.database import add_default_batch, update_default_batch
 
 boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/boardpanel")
 
@@ -97,3 +97,15 @@ def newdate_page():
 @login_required
 def default_page():
     return render_template('default.html')
+
+@boardpanel_bp.route('/defaultbatch', methods=['GET', 'POST'])
+@login_required
+def defaultbatch_page():
+    form = DefaultBatchForm()
+    
+    if form.validate_on_submit():
+        schedules = [form.batch1.data, form.batch2.data, form.batch3.data, form.batch4.data, form.batch5.data]
+        
+        count = update_default_batch(form.capacity.data, form.booking_limit.data, form.number_of_batches.data, schedules)
+        print(count)
+    return render_template('defaultbatch.html', form=form)

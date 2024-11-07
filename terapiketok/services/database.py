@@ -105,3 +105,61 @@ def add_new_admin(username, hashed_password):
     
     return count
 
+def add_default_batch(capacity, booking_limit, num_batches, batch_scedules):
+    count = 0
+    new_values = [capacity, booking_limit, num_batches] + batch_scedules
+    column_names = ["capacity", "booking_limit", "number_of_batches"]
+    for i, schdules in enumerate( batch_scedules):
+        column_names.append(f"batch{i+1}")
+    
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                columns = ', '.join([f"{column}" for column in column_names])
+                values_con = ','.join(["%s" for column in column_names])
+
+                sql = f"""
+                    INSERT INTO default_batch ({columns})
+                    VALUES ({values_con})
+                """
+                
+                cur.execute(sql, new_values)
+
+                conn.commit()
+                count = cur.rowcount
+                
+    
+    except psycopg2.OperationalError as e:
+        raise Exception(f"Database error: {e}")
+    except psycopg2.ProgrammingError as e:
+        raise Exception(f"Invalid SQL query: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    
+    return count
+
+def update_default_batch(capacity, booking_limit, num_batches, batch_scedules):
+    new_values = [capacity, booking_limit, num_batches] + batch_scedules
+
+    sql = f"""
+        UPDATE default_batch
+        SET capacity = %s, booking_limit = %s, number_of_batches = %s,
+            {", ".join(f"batch{i+1} = %s" for i in range(len(batch_scedules)))}
+        WHERE default_batch_id = 1
+    """
+    
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, new_values)
+
+                conn.commit()
+                return cur.rowcount
+                
+    
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    
+

@@ -92,3 +92,11 @@ address {
   border-radius: 5px;
 }
 
+@media screen and (max-width: 370px)  {
+  .adjustCol {
+    width: 100px;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+  }
+}
+

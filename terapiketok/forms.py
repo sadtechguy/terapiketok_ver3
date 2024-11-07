@@ -32,13 +32,12 @@ class LoginAdminForm(FlaskForm):
 
 class DefaultBatchForm(FlaskForm):
     capacity = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "capacity/shift"})
-    limit = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "booking limit"})
-    num_batches = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "jumlah shift"})
-    batch1 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Username"})
-    batch2 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Username"})
-    batch3 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Username"})
-    batch4 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Username"})
-    batch5 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Username"})
-    batch6 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Username"})
-    batch7 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Username"})
+    booking_limit = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "limit per HP"})
+    number_of_batches = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "jumlah shift"})
+    batch1 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 1"})
+    batch2 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 2"})
+    batch3 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 3"})
+    batch4 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 4"})
+    batch5 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 5"})
+    
     submit = SubmitField("SUBMIT")
