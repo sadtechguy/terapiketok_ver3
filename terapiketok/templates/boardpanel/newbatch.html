@@ -18,7 +18,12 @@
         </div>
         <form method="POST" style="font-size: smaller;">
             {{ form.hidden_tag() }}
-            <h1>NEW BATCHES</h1>
+
+            {% for batch_form in form.batches %}
+                {{ batch_form.hidden_tag() }}
+                {{ batch_form.start_time(class="form-control") }}
+                {{ batch_form.capacity(class="form-control") }}
+            {% endfor %}
 
             {{ form.submit(class="btn btn-success form-control p-2") }}
         </form>

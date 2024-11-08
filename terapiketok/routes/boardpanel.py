@@ -4,6 +4,7 @@ from flask_login import login_user, LoginManager, login_required, logout_user,cu
 from flask_bcrypt import Bcrypt
 from ..models import Adminuser, Default_batch, Opening_message
 from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm
+from ..services.data_processing import format_date_str
 from terapiketok import app, bcrypt, db
 
 from ..services.database import add_default_batch, update_default_batch, update_opening_message
@@ -113,10 +114,21 @@ def newbatch_page():
     target_batch_date_str = session.get("target_batch_date")
     if target_batch_date_str:
         # print(type(target_batch_date_str))
-        target_batch_date = datetime.datetime.strptime(target_batch_date_str, "%a, %d %b %Y %H:%M:%S %Z")
-        formatted_date = target_batch_date.strftime("%d-%b-%Y")
+        formatted_date = format_date_str(target_batch_date_str)
         
     default_set = Default_batch.query.filter_by(default_batch_id=1).first()
+
+    for num in range(target_batch_num):
+        cur_batch_attr =f"batch{num+1}"
+        batch_time_range = getattr(default_set, cur_batch_attr)
+        start_time, end_time = batch_time_range.split('-')
+        print(start_time, end_time)
+        batch_form = NewBatchForm(
+            start_time = f"{start_time}",
+            end_time = end_time,
+            capacity = default_set.capacity
+        )
+        form.batches.append_entry(batch_form.data)
     
     
     return render_template('newbatch.html', form=form, batches=target_batch_num, new_date=formatted_date, default_set=default_set)
