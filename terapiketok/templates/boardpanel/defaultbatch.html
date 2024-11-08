@@ -23,26 +23,32 @@
                     {{ form.number_of_batches(class="form-control", value=default_set.number_of_batches, style="font-size: small") }}
                 </div>
             </div>
+            gunakan format seperti ini: 08:00
             <div class="d-flex flex-wrap mb-3">
-                <div class="col-4 adjustCol mb-3">
+                <div class="col-4 adjustCol mb-3 p-1">
                     Shift 1
-                    {{ form.batch1(class="form-control", value=default_set.batch1, style="font-size: small")}}
+                    {{ form.batch1_start(class="form-control", value=default_set.batch1_start, style="font-size: small")}}
+                    {{ form.batch1_end(class="form-control", value=default_set.batch1_end, style="font-size: small")}}
                 </div>
-                <div class="col-4 adjustCol">
+                <div class="col-4 adjustCol p-1">
                     Shift 2
-                    {{ form.batch2(class="form-control", value=default_set.batch2, style="font-size: small")}}
+                    {{ form.batch2_start(class="form-control", value=default_set.batch2_start, style="font-size: small")}}
+                    {{ form.batch2_end(class="form-control", value=default_set.batch2_end, style="font-size: small")}}
                 </div>
-                <div class="col-4 adjustCol">
+                <div class="col-4 adjustCol p-1">
                     Shift 3
-                    {{ form.batch3(class="form-control", value=default_set.batch3, style="font-size: small")}}
+                    {{ form.batch3_start(class="form-control", value=default_set.batch3_start, style="font-size: small")}}
+                    {{ form.batch3_end(class="form-control", value=default_set.batch3_end, style="font-size: small")}}
                 </div>
-                <div class="col-4 adjustCol">
+                <div class="col-4 adjustCol p-1">
                     Shift 4
-                    {{ form.batch4(class="form-control", value=default_set.batch4, style="font-size: small")}}
+                    {{ form.batch4_start(class="form-control", value=default_set.batch4_start, style="font-size: small")}}
+                    {{ form.batch4_end(class="form-control", value=default_set.batch4_end, style="font-size: small")}}
                 </div>
-                <div class="col-4 adjustCol">
+                <div class="col-4 adjustCol p-1">
                     Shift 5
-                    {{ form.batch5(class="form-control", value=default_set.batch5, style="font-size: small")}}
+                    {{ form.batch5_start(class="form-control", value=default_set.batch5_start, style="font-size: small")}}
+                    {{ form.batch5_end(class="form-control", value=default_set.batch5_end, style="font-size: small")}}
                 </div>
             </div>
             

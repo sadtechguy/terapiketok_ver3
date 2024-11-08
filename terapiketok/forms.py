@@ -42,6 +42,22 @@ class DefaultBatchForm(FlaskForm):
     batch5 = StringField(validators=[InputRequired(), Length(min=7, max=16)], render_kw={"placeholder": "Batch 5"})
     
     submit = SubmitField("SUBMIT")
+class DefaultBatchForm2(FlaskForm):
+    capacity = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "capacity/shift"})
+    booking_limit = IntegerField(validators=[InputRequired()], render_kw={"placeholder": "limit per HP"})
+    number_of_batches = IntegerField(validators=[InputRequired(), NumberRange(min=1, max=10)], render_kw={"placeholder": "jumlah shift"})
+    batch1_start = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "start"})
+    batch1_end = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "end"})
+    batch2_start = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "start"})
+    batch2_end = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "end"})
+    batch3_start = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "start"})
+    batch3_end = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "end"})
+    batch4_start = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "start"})
+    batch4_end = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "end"})
+    batch5_start = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "start"})
+    batch5_end = StringField(validators=[InputRequired(), Length(min=5, max=8)], render_kw={"placeholder": "end"})
+    
+    submit = SubmitField("SUBMIT")
 
 class OpeningMessageForm(FlaskForm):
     text_message = TextAreaField(validators=[Length(min=2, max=500)], render_kw={"placeholder": "write message here"})

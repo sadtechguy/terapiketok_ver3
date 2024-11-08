@@ -24,6 +24,7 @@ class Schedule(db.Model):
 class Workingdays(db.Model):
     day_id = db.Column(db.String(2), primary_key=True)
     day_name_ina = db.Column(db.String(7))
+    day_num = db.Column(db.Integer)
 class Booking_tickets(db.Model):
     ticket_uid = db.Column(db.UUID, primary_key=True)
     batch_id = db.Column(db.Integer, db.ForeignKey('batches.batch_id'))
@@ -47,16 +48,23 @@ class Default_batch(db.Model):
     capacity = db.Column(db.Integer)
     booking_limit = db.Column(db.Integer, nullable=False)
     number_of_batches = db.Column(db.Integer, nullable=False)
-    batch1 = db.Column(db.Integer)
-    batch2 = db.Column(db.Integer)
-    batch3 = db.Column(db.Integer)
-    batch4 = db.Column(db.Integer)
-    batch5 = db.Column(db.Integer)
+    batch1_start = db.Column(db.Integer)
+    batch1_end = db.Column(db.Integer)
+    batch2_start = db.Column(db.Integer)
+    batch2_end = db.Column(db.Integer)
+    batch3_start = db.Column(db.Integer)
+    batch3_end = db.Column(db.Integer)
+    batch4_start = db.Column(db.Integer)
+    batch4_end = db.Column(db.Integer)
+    batch5_start = db.Column(db.Integer)
+    batch5_end = db.Column(db.Integer)
 
 class Opening_message(db.Model):
     message_id = db.Column(db.Integer, primary_key=True)
     text_message = db.Column(db.String(500))
     is_active = db.Column(db.Boolean, default=True)
+
+
 
 
 

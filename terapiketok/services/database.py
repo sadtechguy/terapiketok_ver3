@@ -162,6 +162,28 @@ def update_default_batch(capacity, booking_limit, num_batches, batch_scedules):
     except Exception as e:
         raise Exception(f"Unknown error: {e}")
     
+def update_default_batch2(query, values):
+
+    sql = f"""
+        UPDATE default_batch
+        SET {query}
+        WHERE default_batch_id = 1
+    """
+    
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, values)
+
+                conn.commit()
+                return cur.rowcount
+                
+    
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    
 def update_opening_message(message, is_active):
     try:
         with psycopg2.connect(conn_string) as conn:
@@ -179,5 +201,26 @@ def update_opening_message(message, is_active):
         raise Exception(f"Database error: {e}")
     except Exception as e:
         raise Exception(f"Unknown error: {e}")
+    
+
+def add_new_batch(day_id, schedule_id, batch_date, start_time, end_time, max_tickets):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"""
+                    INSERT INTO batches (day_id, schedule_id, batch_date, start_time, end_time, max_tickets)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (schedule_id, batch_date) DO NOTHING;
+                """, (day_id, schedule_id, batch_date, start_time, end_time, max_tickets))
+
+                conn.commit()
+                return cur.rowcount
+                
+    
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    return 0
     
 

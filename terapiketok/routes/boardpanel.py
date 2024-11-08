@@ -2,12 +2,12 @@ import datetime, uuid
 from flask import Blueprint, render_template_string, render_template, request, redirect, url_for, session, flash
 from flask_login import login_user, LoginManager, login_required, logout_user,current_user
 from flask_bcrypt import Bcrypt
-from ..models import Adminuser, Default_batch, Opening_message
-from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm
-from ..services.data_processing import format_date_str
+from ..models import Adminuser, Default_batch, Opening_message, Workingdays
+from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm
+from ..services.data_processing import format_date_str, format_default_batch_time
 from terapiketok import app, bcrypt, db
 
-from ..services.database import add_default_batch, update_default_batch, update_opening_message
+from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch
 
 boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/boardpanel")
 
@@ -118,20 +118,42 @@ def newbatch_page():
         
     default_set = Default_batch.query.filter_by(default_batch_id=1).first()
 
+    if form.validate_on_submit():
+        def get_day_id(date_str):
+            day_num = datetime.datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z").weekday()
+            day_data = Workingdays.query.filter_by(day_num=day_num).first()
+            return day_data.day_id
+
+        for index, batch_form in enumerate(form.batches):
+            schedule_id = index+1
+            batch_date = formatted_date
+            start_time = batch_form.start_time.data
+            end_time = batch_form.end_time.data
+            max_tickets = batch_form.capacity.data
+            day_id = get_day_id(target_batch_date_str)
+
+            count = add_new_batch(day_id, schedule_id, batch_date, start_time, end_time, max_tickets)
+            if count > 0:
+                flash(f"Add New Date on {formatted_date}", category="success")    
+            else:
+                flash("Failed to updated", category="warning")
+
+        return redirect(url_for('boardpanel.boardpanel_page'))
+    
     for num in range(target_batch_num):
-        cur_batch_attr =f"batch{num+1}"
-        batch_time_range = getattr(default_set, cur_batch_attr)
-        start_time, end_time = batch_time_range.split('-')
-        print(start_time, end_time)
+        cur_batch_attr_start =f"batch{num+1}_start"
+        cur_batch_attr_end =f"batch{num+1}_end"
+        start_time = getattr(default_set, cur_batch_attr_start)
+        end_time = getattr(default_set, cur_batch_attr_end)
+        
         batch_form = NewBatchForm(
-            start_time = f"{start_time}",
+            start_time = start_time,
             end_time = end_time,
             capacity = default_set.capacity
         )
         form.batches.append_entry(batch_form.data)
     
-    
-    return render_template('newbatch.html', form=form, batches=target_batch_num, new_date=formatted_date, default_set=default_set)
+    return render_template('newbatch.html', form=form, batches=target_batch_num, new_date=formatted_date, default_set=default_set, enumerate=enumerate)
 
 @boardpanel_bp.route('/default', methods=['GET', 'POST'])
 @login_required
@@ -141,14 +163,15 @@ def default_page():
 @boardpanel_bp.route('/defaultbatch', methods=['GET', 'POST'])
 @login_required
 def defaultbatch_page():
-    form = DefaultBatchForm()
+    form = DefaultBatchForm2()
 
     default_set = Default_batch.query.filter_by(default_batch_id=1).first()
+    default_set = format_default_batch_time(default_set)
     
     if form.validate_on_submit():
-        schedules = [form.batch1.data, form.batch2.data, form.batch3.data, form.batch4.data, form.batch5.data]
-        
-        count = update_default_batch(form.capacity.data, form.booking_limit.data, form.number_of_batches.data, schedules)
+        query = f"capacity = %s, booking_limit = %s, number_of_batches = %s, batch1_start = %s, batch1_end = %s, batch2_start = %s, batch2_end = %s, batch3_start = %s, batch3_end = %s, batch4_start = %s, batch4_end = %s, batch5_start = %s, batch5_end = %s"
+        values = (form.capacity.data, form.booking_limit.data, form.number_of_batches.data, form.batch1_start.data, form.batch1_end.data, form.batch2_start.data, form.batch2_end.data, form.batch3_start.data, form.batch3_end.data, form.batch4_start.data, form.batch4_end.data, form.batch5_start.data, form.batch5_end.data)
+        count = update_default_batch2(query, values)
         if count > 0:
             flash("Default updated successfully", category="success")    
         else:

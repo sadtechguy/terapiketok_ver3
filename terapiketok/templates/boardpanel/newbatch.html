@@ -18,12 +18,28 @@
         </div>
         <form method="POST" style="font-size: smaller;">
             {{ form.hidden_tag() }}
-
-            {% for batch_form in form.batches %}
-                {{ batch_form.hidden_tag() }}
-                {{ batch_form.start_time(class="form-control") }}
-                {{ batch_form.capacity(class="form-control") }}
-            {% endfor %}
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">shift</th>
+                    <th scope="col">Start</th>
+                    <th scope="col">End</th>
+                    <th scope="col">Capacity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for index, batch_form in enumerate(form.batches) %}
+                    <tr>
+                        {{ batch_form.hidden_tag() }}
+                        <th scope="row">shift{{ index + 1 }}</th>
+                        <td>{{ batch_form.start_time() }}</td>
+                        <td>{{ batch_form.end_time() }}</td>
+                        <td>{{ batch_form.capacity() }}</td>
+                    </tr>
+                    {% endfor %}
+                  
+                </tbody>
+              </table>
 
             {{ form.submit(class="btn btn-success form-control p-2") }}
         </form>
