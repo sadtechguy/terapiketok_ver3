@@ -67,6 +67,16 @@ a:hover {
   background-size: 45px 75px;
   text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.9);
 }
+.bgCustomPENDING {
+  background-color: #f0ad4e;
+}
+.bgCustomOPEN {
+  background-color: #5cb85c;
+}
+.bgCustomCLOSED, .bgCustomFULL {
+  background-color: #d9534f;
+}
+
 
 header h1 {
   font-size: 3rem;

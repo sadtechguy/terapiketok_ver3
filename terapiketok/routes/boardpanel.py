@@ -2,7 +2,7 @@ import datetime, uuid
 from flask import Blueprint, render_template_string, render_template, request, redirect, url_for, session, flash
 from flask_login import login_user, LoginManager, login_required, logout_user,current_user
 from flask_bcrypt import Bcrypt
-from ..models import Adminuser, Default_batch, Opening_message, Workingdays
+from ..models import Adminuser, Default_batch, Opening_message, Workingdays, Batches
 from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm
 from ..services.data_processing import format_date_str, format_default_batch_time
 from terapiketok import app, bcrypt, db
@@ -81,8 +81,12 @@ def logout_page():
 @boardpanel_bp.route('/boardpanel', methods=['GET', 'POST'])
 @login_required
 def boardpanel_page():
-    text_header = "DASHBOARD"
-    return render_template('boardpanel.html', text_header=text_header)
+    today = datetime.date.today()
+    text_header = 'Dashboard'
+    
+    batches = Batches.query.filter(Batches.batch_date >= today).all()
+
+    return render_template('boardpanel.html', text_header=text_header, batches=batches)
 
 @boardpanel_bp.route('/batches')
 def batch_page():
