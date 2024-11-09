@@ -84,7 +84,7 @@ def boardpanel_page():
     today = datetime.date.today()
     text_header = 'Dashboard'
     
-    batches = Batches.query.filter(Batches.batch_date >= today).all()
+    batches = Batches.query.filter(Batches.batch_date >= today).order_by(Batches.batch_date.asc(), Batches.schedule_id.asc()).all()
 
     return render_template('boardpanel.html', text_header=text_header, batches=batches)
 
