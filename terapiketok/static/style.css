@@ -77,6 +77,14 @@ a:hover {
   background-color: #d9534f;
 }
 
+#statusForm {
+  position: fixed;
+  top: 30vh;
+  left: 50%;
+  width: 200px;
+  margin-left: -100px;
+}
+
 
 header h1 {
   font-size: 3rem;

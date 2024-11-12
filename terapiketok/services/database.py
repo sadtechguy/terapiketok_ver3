@@ -222,5 +222,56 @@ def add_new_batch(day_id, schedule_id, batch_date, start_time, end_time, max_tic
     except Exception as e:
         raise Exception(f"Unknown error: {e}")
     return 0
+
+def update_batch_status_by_batch(batch_id, status):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                # Check the current status and max tickets
+                cur.execute("SELECT current_tickets, max_tickets FROM batches WHERE batch_id = %s", (batch_id,))
+                result = cur.fetchone()
+                current_tickets, max_tickets = result
+
+                if current_tickets >= max_tickets and status == "OPEN":
+                    return False, "Cannot set status to 'OPEN' because booked tickets already at maximum capacity"
+                
+                cur.execute(f"""
+                    UPDATE batches
+                    SET status = %s
+                    WHERE batch_id = %s
+                """, (status, batch_id))
+
+                conn.commit()
+                return True, "Status updated successfully"
+                
+    
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    
+def update_batch_status_by_date(batch_date, status):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                # Check the current status and max tickets
+                cur.execute("SELECT batch_id, current_tickets, max_tickets FROM batches WHERE batch_date = %s", (batch_date,))
+                batches = cur.fetchall()
+                
+                for batch_id, current_tickets, max_tickets in batches:
+                    if current_tickets >= max_tickets and status == "OPEN":
+                        continue # Skip updating if the batch is already full
+                
+                    cur.execute(f"UPDATE batches SET status = %s WHERE batch_id = %s", (status, batch_id))
+
+                conn.commit()
+                return True, "Status updated successfully"
+    
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    
+    return False, "Failed to update status"
     
 

@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from flask_wtf import FlaskForm
 from .models import Adminuser
-from wtforms import StringField, IntegerField, SubmitField, PasswordField, BooleanField, TextAreaField, DateField, TimeField, FieldList, FormField
+from wtforms import StringField, IntegerField, SubmitField, PasswordField, BooleanField, TextAreaField, DateField, TimeField, FieldList, FormField, SelectField
 from wtforms.validators import DataRequired, InputRequired, Length, ValidationError, NumberRange
 
 class LoginForm(FlaskForm):
@@ -77,4 +77,12 @@ class NewDateForm(FlaskForm):
     batch_date = DateField("Tanggal", format="%Y-%m-%d", validators=[InputRequired()], default=date.today() + timedelta(days=1))
     batches = IntegerField("Jumlah Shift",validators=[InputRequired(), NumberRange(min=1, max=10)])
     submit = SubmitField(label='Submit!')
+
+class ChangeStatusForm(FlaskForm):
+    status_option = SelectField('Change status', choices=[
+        ('open_all', 'open (all in same date)'),
+        ('open_shift', 'open (this shift only)'),
+        ('closed', 'closed'),
+    ])
+    submit = SubmitField('Submit')
     

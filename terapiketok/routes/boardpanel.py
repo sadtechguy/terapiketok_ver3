@@ -2,12 +2,12 @@ import datetime, uuid
 from flask import Blueprint, render_template_string, render_template, request, redirect, url_for, session, flash
 from flask_login import login_user, LoginManager, login_required, logout_user,current_user
 from flask_bcrypt import Bcrypt
-from ..models import Adminuser, Default_batch, Opening_message, Workingdays, Batches
-from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm
+from ..models import Adminuser, Default_batch, Opening_message, Workingdays, Batches, Booking_tickets
+from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm, ChangeStatusForm
 from ..services.data_processing import format_date_str, format_default_batch_time
 from terapiketok import app, bcrypt, db
 
-from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch
+from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date
 
 boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/boardpanel")
 
@@ -159,10 +159,45 @@ def newbatch_page():
     
     return render_template('newbatch.html', form=form, batches=target_batch_num, new_date=formatted_date, default_set=default_set, enumerate=enumerate)
 
+@boardpanel_bp.route('/batchdetail/<batch_id>', methods=['GET', 'POST'])
+@login_required
+def batchdetail_page(batch_id):
+    curr_batch = Batches.query.filter_by(batch_id=batch_id).first()
+    curr_batch_id = curr_batch.batch_id
+    curr_date = curr_batch.batch_date
+    batches = Batches.query.filter(Batches.batch_date == curr_date).order_by(Batches.batch_date.asc(), Batches.schedule_id.asc()).all()
+    tickets = Booking_tickets.query.filter_by(batch_id=curr_batch_id).all()
+    form = ChangeStatusForm()
+
+    if form.validate_on_submit():
+        option = form.status_option.data
+        status = None
+        result_status = None
+        message = None
+        if option == "open_shift":
+            status = "OPEN"
+            result_status, message = update_batch_status_by_batch(curr_batch_id, status)
+        elif option == "open_all":
+            status = "OPEN"
+            result_status, message = update_batch_status_by_date(curr_date, status)
+        else:
+            status = "CLOSED"
+            result_status, message = update_batch_status_by_batch(curr_batch_id, status)
+        
+        if result_status:
+            flash(message, category="success")
+        else:
+            flash(message, category="warning")
+        return redirect(url_for("boardpanel.batchdetail_page", batch_id=curr_batch_id))
+        
+
+    return render_template('batchdetail.html', batch=curr_batch, batches=batches, tickets=tickets, enumerate=enumerate, form=form)
+
 @boardpanel_bp.route('/default', methods=['GET', 'POST'])
 @login_required
 def default_page():
     return render_template('default.html')
+
 
 @boardpanel_bp.route('/defaultbatch', methods=['GET', 'POST'])
 @login_required

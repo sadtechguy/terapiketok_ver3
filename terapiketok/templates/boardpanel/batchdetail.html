@@ -1,0 +1,47 @@
+{% extends 'baseboardpanel.html' %}
+
+{% block content %}
+    <div class="d-flex flex-column">
+        <div>{{ batch.workingdays.day_name_ina }}, {{ batch.batch_date.strftime('%d-%b-%Y') }}</div>
+        <div>Shitf {{ batch.schedule_id }}, jam {{ batch.start_time.strftime('%H:%M') }}-{{ batch.end_time.strftime('%H:%M') }}</div>
+        <div class="pb-3">Booked: {{ batch.current_tickets }} / {{ batch.max_tickets }}</div>
+        
+        <div>
+            Status: {{ batch.status }}
+        </div>
+        <div class="pb-3">
+            <form method="POST" onSubmit="return confirm('Are you sure?')">
+                <div style="font-size: smaller;">
+                    {{ form.hidden_tag() }}
+                    {{ form.status_option.label() }}
+                    {{ form.status_option() }}
+                    {{ form.submit(class="btn btn-success btn-sm") }}
+                </div>
+            </form>
+        </div>
+        
+    </div>
+            
+    <table class="table table-stripped" style="font-size: x-small;">
+        <thead>
+            <tr>
+                <th scope="col">no</th>
+                <th scope="col">booking code</th>
+                <th scope="col">name</th>
+                <th scope="col">phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for index, ticket in enumerate(tickets) %}
+            <tr>
+                <th scope="row">{{ index+1 }}</th>
+                <td>{{ ticket.ticket_uid }}</td>
+                <td>{{ ticket.customer_name }}</td>
+                <td>{{ ticket.phone }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+            
+            
