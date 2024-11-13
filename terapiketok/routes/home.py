@@ -4,6 +4,7 @@ from ..services.database import fetch_available_batch, create_booking, fetct_que
 from ..services.data_processing import authenticate_user, get_queue_number
 from ..forms import LoginForm, ConfirmationForm, CloseTicketButton
 from ..models import Batches, Booking_tickets
+from terapiketok import db
 
 home_bp = Blueprint('home', __name__, template_folder="../templates/home")
 
@@ -48,8 +49,6 @@ def register_page():
         status = batch[8]
         batch_id = batch[9]
 
-        print(batch)
-
         classes = {
             "OPEN": ("bgActive", "text-dark", "success"),
             "CLOSED": ("bgNonActive", "white-transparent", "danger")
@@ -66,6 +65,13 @@ def register_page():
 
 @home_bp.route('/confirmation/<int:batch_id>', methods=['GET', 'POST'])
 def confirmation_page(batch_id):
+    batch = Batches.query.filter_by(batch_id=batch_id).first()
+
+    # Check if the batch status is "OPEN"
+    if batch.status != "OPEN":
+        flash("Batch is not open for booking.", "warning")
+        return redirect(url_for('.register_page'))
+
     username = session.get("username")
     phone = session.get("phone")
     
@@ -99,15 +105,26 @@ def ticket_page():
         return redirect(url_for('.register_page'))
     
     ticket_uid = session.get("ticket")
-    if ticket_uid:
-        ticket = Booking_tickets.query.get(ticket_uid)
-        list_queue = fetct_queue_number(ticket.batch_id)
-        queue_number = get_queue_number(list_queue, ticket_uid)
-        if queue_number == -1:
-            queue_number = "XX"
-    else:
+    if not ticket_uid:
         flash(f"Tidak dapat Tiket. Mohon maaf", category="danger")
         return redirect(url_for(".register_page"))
+    
+    ticket = Booking_tickets.query.get(ticket_uid)
+    # Check if the ticket has been used
+    if ticket.used:
+        flash("This ticket has already been used.", "warning")
+        return redirect(url_for('.register_page'))
+    
+    # Mark the ticket as used
+    ticket.used = True
+    db.session.commit()
+    session.pop('ticket', None) # erase session ticket
+
+    list_queue = fetct_queue_number(ticket.batch_id)
+    queue_number = get_queue_number(list_queue, ticket_uid)
+    if queue_number == -1:
+        queue_number = "XX"
+    
     return render_template('ticket.html', ticket=ticket, queue_number=queue_number, form=form)
 
 

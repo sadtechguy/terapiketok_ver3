@@ -30,6 +30,7 @@ class Booking_tickets(db.Model):
     batch_id = db.Column(db.Integer, db.ForeignKey('batches.batch_id'))
     customer_name = db.Column(db.String(50))
     phone = db.Column(db.String(30))
+    used = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime)
 
     # Relationship with the schedule table
