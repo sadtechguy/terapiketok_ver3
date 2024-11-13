@@ -9,6 +9,11 @@ class LoginForm(FlaskForm):
     phone = StringField(label='Nomer HP', validators=[DataRequired()])
     submit = SubmitField(label='Login')
 
+class AddCustomerManualForm(FlaskForm):
+    username = StringField(label='Nama', validators=[DataRequired()])
+    phone = StringField(label='HP', validators=[DataRequired()])
+    submit = SubmitField(label='Submit')
+
 class ConfirmationForm(FlaskForm):
     submit = SubmitField(label='YES')
 

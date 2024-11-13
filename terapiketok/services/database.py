@@ -82,6 +82,28 @@ def create_booking(batch_id, username, phone, appointment_date, ticket_uid):
         raise Exception(f"Unknown error: {e}")
     return False, "Failed to create booking"
 
+def add_customer_manually(batch_id, username, phone, appointment_date, ticket_uid):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute("BEGIN TRANSACTION;")
+                cur.execute("SELECT * FROM Batches WHERE batch_id = %s FOR UPDATE;", (batch_id,))
+
+                cur.execute("UPDATE Batches SET current_tickets = current_tickets + 1 WHERE batch_id=%s", (batch_id,))
+
+                # Insert booking data into the booking_tickets table
+                cur.execute("INSERT INTO booking_tickets (ticket_uid, batch_id, appointment_date, customer_name, phone) VALUES (%s,%s,%s,%s,%s)", (ticket_uid, batch_id, appointment_date, username, phone))
+                cur.execute("COMMIT")
+                
+                return True, "Booking created succesfully"
+
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    return False, "Failed to create booking"
+
+
 def add_new_admin(username, hashed_password):
     count = 0
     try:

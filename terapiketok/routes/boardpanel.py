@@ -3,11 +3,11 @@ from flask import Blueprint, render_template_string, render_template, request, r
 from flask_login import login_user, LoginManager, login_required, logout_user,current_user
 from flask_bcrypt import Bcrypt
 from ..models import Adminuser, Default_batch, Opening_message, Workingdays, Batches, Booking_tickets
-from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm, ChangeStatusForm
-from ..services.data_processing import format_date_str, format_default_batch_time
+from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm, ChangeStatusForm, AddCustomerManualForm, CloseTicketButton
+from ..services.data_processing import format_date_str, format_default_batch_time, get_queue_number
 from terapiketok import app, bcrypt, db
 
-from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date
+from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date, add_customer_manually, fetct_queue_number
 
 boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/boardpanel")
 
@@ -201,6 +201,59 @@ def addmanual_page():
     batches = Batches.query.filter(Batches.batch_date >= today).order_by(Batches.batch_date.asc(), Batches.schedule_id.asc()).all()
 
     return render_template('addmanual.html', batches=batches)
+
+
+@boardpanel_bp.route('/batch_to_add/<batch_id>', methods=['GET', 'POST'])
+@login_required
+def batch_to_add_page(batch_id):
+    batch = Batches.query.filter_by(batch_id=batch_id).first()
+    form = AddCustomerManualForm()
+
+    if form.validate_on_submit():
+        ticket_uid = uuid.uuid4()
+        username = form.username.data
+        phone = form.phone.data
+        batch_date = batch.batch_date
+        status, message = add_customer_manually(batch_id, username, phone, batch_date, ticket_uid)
+
+        if status:
+            session["ticket"] = ticket_uid
+            flash(message, category="success")
+            return redirect(url_for('.ticketmanual_page'))
+        else:
+            flash(message, category="danger")
+            return redirect(url_for('.boardpanel_page'))
+
+    return render_template('batch_to_add.html', batch=batch, form=form)
+
+@boardpanel_bp.route('/ticketmanual', methods=['GET', 'POST'])
+def ticketmanual_page():
+    form = CloseTicketButton()
+    if form.validate_on_submit():
+        return redirect(url_for('.boardpanel_page'))
+    
+    ticket_uid = session.get("ticket")
+    if not ticket_uid:
+        flash(f"Tidak dapat Tiket. Mohon maaf", category="danger")
+        return redirect(url_for(".boardpanel_page"))
+    
+    ticket = Booking_tickets.query.get(ticket_uid)
+    # Check if the ticket has been used
+    if ticket.used:
+        flash("This ticket has already been used.", "warning")
+        return redirect(url_for('.boardpanel_page'))
+    
+    # Mark the ticket as used
+    ticket.used = True
+    db.session.commit()
+    session.pop('ticket', None) # erase session ticket
+
+    list_queue = fetct_queue_number(ticket.batch_id)
+    queue_number = get_queue_number(list_queue, ticket_uid)
+    if queue_number == -1:
+        queue_number = "XX"
+    
+    return render_template('ticket.html', ticket=ticket, queue_number=queue_number, form=form)
 
 @boardpanel_bp.route('/default', methods=['GET', 'POST'])
 @login_required
