@@ -16,7 +16,7 @@ def fetch_available_batch(start_date):
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT batch_date, day_name_ina, schedule_id, schedule_name, 
-                        start_time, end_time, max_tickets, current_tickets, status 
+                        start_time, end_time, max_tickets, current_tickets, status, batch_id
                             FROM batches 
                             JOIN workingdays USING (day_id)
                             JOIN schedule USING (schedule_id)

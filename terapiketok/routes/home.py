@@ -46,6 +46,9 @@ def register_page():
         start_hour = batch[4].strftime('%H:%M')
         end_hour = batch[5].strftime('%H:%M')
         status = batch[8]
+        batch_id = batch[9]
+
+        print(batch)
 
         classes = {
             "OPEN": ("bgActive", "text-dark", "success"),
@@ -55,7 +58,7 @@ def register_page():
 
         clean_batches.append(
             (batch_date, batch_day, schedule_id, schedule_name, start_hour, end_hour, status,
-              left_side_class, middle_side_class, right_side_class)
+              left_side_class, middle_side_class, right_side_class, batch_id)
         )
 
     return render_template('register.html', batches=clean_batches, text_header=text_header)
