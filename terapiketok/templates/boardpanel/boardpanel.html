@@ -4,18 +4,7 @@
 <main class="container bg-light p-0" style="min-height: 100vh;">
     <div class="p-3">
         <div class="row">
-            <div class="col p-0">
-                <a href={{ url_for('boardpanel.batch_page') }} style="text-decoration: none;">
-                    <div class="card m-1 p-3 text-center" style="border-radius: 10px;">
-                        Available Batch
-                    </div>
-                </a>
-                <a href="#" style="text-decoration: none;">
-                    <div class="card m-1 p-3 text-center" style="border-radius: 10px;">
-                        List Customer
-                    </div>
-                </a>
-            </div>
+            
             <div class="col p-0">
                 <a href={{ url_for('boardpanel.newdate_page') }} style="text-decoration: none;">
                     <div class="card m-1 p-3 text-center" style="border-radius: 10px;">
@@ -28,6 +17,20 @@
                     </div>
                 </a>
             </div>
+
+            <div class="col p-0">
+                <a href={{ url_for('boardpanel.addmanual_page') }} style="text-decoration: none;">
+                    <div class="card m-1 p-3 text-center" style="border-radius: 10px;">
+                        Add manual
+                    </div>
+                </a>
+                <a href="#" style="text-decoration: none;">
+                    <div class="card m-1 p-3 text-center" style="border-radius: 10px;">
+                        List Customer
+                    </div>
+                </a>
+            </div>
+
         </div>
 
         <!-- Available Batches -->
@@ -45,8 +48,8 @@
                         <div class="col-9 text-dark">
                             <div class="card-body" style="padding: 0.5rem 1rem;">
                             <h6 class="card-title" style="font-weight: 400; line-height: 0.9; margin: 0;"> Shift-{{ batch.schedule_id }}</h6>
-                            <p class="card-text" style="font-size: 18px; line-height: 1; margin: 5px 0">Jam: {{ batch.start_time }} - {{ batch.end_time }}</p>
-                            <p class="card-text" style="line-height: 0.9; "><small class="text-muted">{{ batch.batch_date.strftime('%d-%b-%Y') }} - booking: {{ batch.current_tickets }} orang</small></p>
+                            <p class="card-text" style="font-size: 18px; line-height: 1; margin: 5px 0">Jam: {{ batch.start_time.strftime('%H:%M') }} - {{ batch.end_time.strftime('%H:%M') }}</p>
+                            <p class="card-text" style="line-height: 0.9; "><small class="text-muted">{{ batch.batch_date.strftime('%d-%b-%Y') }} - already booked: {{ batch.current_tickets }}/{{ batch.max_tickets }}</small></p>
                             </div>
                         </div>
                         <!-- right side -->

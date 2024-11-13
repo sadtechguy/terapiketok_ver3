@@ -193,6 +193,15 @@ def batchdetail_page(batch_id):
 
     return render_template('batchdetail.html', batch=curr_batch, batches=batches, tickets=tickets, enumerate=enumerate, form=form)
 
+@boardpanel_bp.route('/addmanual', methods=['GET', 'POST'])
+@login_required
+def addmanual_page():
+    today = datetime.date.today()
+    
+    batches = Batches.query.filter(Batches.batch_date >= today).order_by(Batches.batch_date.asc(), Batches.schedule_id.asc()).all()
+
+    return render_template('addmanual.html', batches=batches)
+
 @boardpanel_bp.route('/default', methods=['GET', 'POST'])
 @login_required
 def default_page():
