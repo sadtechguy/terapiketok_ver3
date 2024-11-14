@@ -46,6 +46,23 @@ def fetct_queue_number(batch_id):
         raise Exception(f"Error fetching queue number: {e}")
     return []
 
+def fetch_available_date_to_edit(start_date):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT DISTINCT (batch_date), day_name_ina
+                        FROM batches 
+                        JOIN workingdays USING (day_id)
+                        WHERE batch_date >= %s
+                        ORDER BY batch_date
+                """,(start_date,))
+                rows = cur.fetchall()
+                return rows
+    except (psycopg2.Error, ValueError) as e:
+        raise Exception(f"Error fetching the data")
+    return []
+
 def create_booking(batch_id, username, phone, appointment_date, ticket_uid):
     try:
         with psycopg2.connect(conn_string) as conn:

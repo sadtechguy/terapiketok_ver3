@@ -7,7 +7,7 @@ from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMess
 from ..services.data_processing import format_date_str, format_default_batch_time, get_queue_number
 from terapiketok import app, bcrypt, db
 
-from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date, add_customer_manually, fetct_queue_number
+from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date, add_customer_manually, fetct_queue_number, fetch_available_date_to_edit
 
 boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/boardpanel")
 
@@ -158,6 +158,22 @@ def newbatch_page():
         form.batches.append_entry(batch_form.data)
     
     return render_template('newbatch.html', form=form, batches=target_batch_num, new_date=formatted_date, default_set=default_set, enumerate=enumerate)
+
+@boardpanel_bp.route('/editoption/<action>', methods=['GET', 'POST'])
+@login_required
+def editoption_page(action):
+    next_action = "delete"
+    if action == "delete":
+        next_action = "edit"
+    today = datetime.date.today()
+    dates_to_edit = fetch_available_date_to_edit(today)
+
+    return render_template('editoption.html', head_text=action, next_action=next_action, dates=dates_to_edit)
+
+@boardpanel_bp.route('/edit', methods=['GET', 'POST'])
+@login_required
+def edit_page(action):
+    next_action = "delete"
 
 @boardpanel_bp.route('/batchdetail/<batch_id>', methods=['GET', 'POST'])
 @login_required
