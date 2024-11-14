@@ -7,7 +7,7 @@ from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMess
 from ..services.data_processing import format_date_str, format_default_batch_time, get_queue_number
 from terapiketok import app, bcrypt, db
 
-from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date, add_customer_manually, fetct_queue_number, fetch_available_date_to_edit, update_and_add_new_batch
+from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date, add_customer_manually, fetct_queue_number, fetch_available_date_to_edit, update_and_add_new_batch, fetch_max_shifts, delete_batch_by_date_scheduleid
 
 boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/boardpanel")
 
@@ -180,15 +180,12 @@ def edit_page():
     day_id = request.args.get('day_id')
 
     batches = Batches.query.filter_by(batch_date=batch_date).order_by(Batches.batch_date.asc(), Batches.schedule_id.asc()).all()
-
+    max_shifts = fetch_max_shifts()
+    if num_batch > max_shifts:
+        num_batch = max_shifts
 
     if form.validate_on_submit():
-        def get_day_id(date_str):
-            day_num = datetime.datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z").weekday()
-            day_data = Workingdays.query.filter_by(day_num=day_num).first()
-            return day_data.day_id
-        
-
+        schedule_id_to_keep = []
         for index, batch_form in enumerate(form.batches):
             schedule_id = index+1
             batch_date = batch_date
@@ -198,11 +195,22 @@ def edit_page():
             day_id = day_id
 
             count = update_and_add_new_batch(day_id, schedule_id, batch_date, start_time, end_time, max_tickets)
+            schedule_id_to_keep.append(schedule_id)
             if count > 0:
                 flash(f"Add New Date on {batch_date}", category="success")    
             else:
                 flash("Failed to updated", category="warning")
 
+        
+        for batch in batches:
+            curr_schedule = batch.schedule_id
+            if curr_schedule not in schedule_id_to_keep:
+                status = delete_batch_by_date_scheduleid(batch_date, curr_schedule)
+                if status:
+                    flash(f"Success delete shift-{curr_schedule} in {batch_date}", category="success")
+                else:
+                    flash(f"Failed delete shift-{curr_schedule} in {batch_date}", category="warning")
+                    
         return redirect(url_for('boardpanel.boardpanel_page'))
 
     for batch in batches:
@@ -213,7 +221,7 @@ def edit_page():
         )
         form.batches.append_entry(batch_form.data)
     
-    if num_batch > len(batches):
+    if num_batch > len(batches) and num_batch <= max_shifts:
         default_set = Default_batch.query.filter_by(default_batch_id=1).first()
         
         for num in range(len(batches), num_batch):
@@ -228,7 +236,9 @@ def edit_page():
                 capacity = default_set.capacity
             )
             form.batches.append_entry(batch_form.data)
-
+    elif num_batch < len(batches) and num_batch <= max_shifts:
+        for num in range(len(batches)-num_batch):
+            form.batches.pop_entry()
 
     return render_template('edit.html', form=form, batches=batches, new_date=batch_date, enumerate=enumerate, num_batch=num_batch, day_id=day_id)
 

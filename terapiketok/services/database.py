@@ -46,6 +46,20 @@ def fetct_queue_number(batch_id):
         raise Exception(f"Error fetching queue number: {e}")
     return []
 
+def fetch_max_shifts():
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT (*) FROM schedule")
+                
+                result = cur.fetchone()
+                return result[0] 
+    
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        print(f"Error connecting to database: {e}")  # Print the original error
+        raise Exception(f"Error fetching queue number: {e}")
+    return 0
+
 def fetch_available_date_to_edit(start_date):
     try:
         with psycopg2.connect(conn_string) as conn:
@@ -332,5 +346,23 @@ def update_batch_status_by_date(batch_date, status):
         raise Exception(f"Unknown error: {e}")
     
     return False, "Failed to update status"
+
+def delete_batch_by_date_scheduleid(batch_date, schedule_id):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"""
+                    DELETE FROM batches
+                    WHERE batch_date = %s AND schedule_id = %s
+                """, (batch_date, schedule_id))
+
+                conn.commit()
+                return True
+                
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    return False
     
 
