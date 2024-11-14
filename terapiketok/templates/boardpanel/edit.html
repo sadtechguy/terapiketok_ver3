@@ -1,0 +1,68 @@
+{% extends 'baseboardpanel.html' %}
+
+{% block content %}
+<main class="container bg-light p-0" style="min-height: 100vh;">
+    <div class="p-3">
+        <h2 class="fs-5">Edit</h2>
+        <div class="d-flex flex-column">
+            <div class="row">
+                <div class="col-3">
+                    Tanggal
+                </div>
+                : {{ new_date }}
+            </div>
+            <div class="row">
+                <div class="col-3">Jumlah Shift</div>
+                : {{ num_batch }}
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <div class="d-flex justify-content-center align-items-center" style="background-color: #198754; color: white;">
+                        <a href="#" style="display: block; text-decoration: none;">
+                            <div class="fs-4 px-2" style="color: white;">
+                            -
+                            </div>
+                        </a>
+                        <div class="fs-5">
+                            shift
+                        </div>
+                        <a href="{{ url_for('boardpanel.edit_page', batch_date=new_date, num_batch=num_batch+1, day_id=day_id) }}" style="display: block; text-decoration: none;">
+                            <div class="fs-4 px-2" style="color: white;">
+                            +
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form method="POST" style="font-size: smaller;">
+            {{ form.hidden_tag() }}
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">shift</th>
+                    <th scope="col">Start</th>
+                    <th scope="col">End</th>
+                    <th scope="col">Capacity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for index, batch_form in enumerate(form.batches) %}
+                    <tr>
+                        {{ batch_form.hidden_tag() }}
+                        <th scope="row">shift{{ index + 1 }}</th>
+                        <td>{{ batch_form.start_time() }}</td>
+                        <td>{{ batch_form.end_time() }}</td>
+                        <td>{{ batch_form.capacity() }}</td>
+                    </tr>
+                    {% endfor %}
+                  
+                </tbody>
+              </table>
+
+            {{ form.submit(class="btn btn-success form-control p-2") }}
+        </form>
+    </div>
+</main>
+
+{% endblock %}

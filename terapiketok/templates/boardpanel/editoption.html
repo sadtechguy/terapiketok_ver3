@@ -8,12 +8,21 @@
 </div>
     <div class="d-flex flex-column mb-3">
         {% for date_info in dates %}
-        <a href="#" style="display: block; text-decoration: none;">
-            <div class="card p-2 text-center mb-2" style="max-width: 200px; border-radius: 10px;">
-                {{ date_info[1] }} {{ date_info[0].strftime('%d-%b-%Y') }} 
-            </div>
-
-        </a>
+            {% if next_action == 'edit' %}
+                <a href="{{ url_for('boardpanel.edit_page', batch_date=date_info[0], num_batch=date_info[3], day_id=date_info[2]) }}" style="display: block; text-decoration: none;">
+                    <div class="card p-2 text-center mb-2" style="max-width: 200px; border-radius: 10px;">
+                        {{ date_info[1] }} {{ date_info[0].strftime('%d-%b-%Y') }}
+                    </div>
+                </a>
+                {% elif next_action == 'delete' %}
+                <a href="{{ url_for('boardpanel.edit_page', batch_date=date_info[0], num_batch=date_info[3], day_id=date_info[2]) }}" style="display: block; text-decoration: none;">
+                    <div class="card p-2 text-center mb-2" style="max-width: 200px; border-radius: 10px;">
+                        {{ date_info[1] }} {{ date_info[0].strftime('%d-%b-%Y') }}
+                    </div>
+                </a>
+            {% else %}
+                <h6>Something wrong, to match action.Should be 'edit' or 'delete'</h6>
+            {% endif %}
         {% endfor %}
     </div>
 {% endblock %}

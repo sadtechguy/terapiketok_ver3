@@ -51,10 +51,11 @@ def fetch_available_date_to_edit(start_date):
         with psycopg2.connect(conn_string) as conn:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT DISTINCT (batch_date), day_name_ina
+                    SELECT DISTINCT (batch_date), day_name_ina, day_id, COUNT (batch_id) AS batch_count
                         FROM batches 
                         JOIN workingdays USING (day_id)
                         WHERE batch_date >= %s
+                        GROUP BY batch_date, day_name_ina, day_id
                         ORDER BY batch_date
                 """,(start_date,))
                 rows = cur.fetchall()
@@ -255,7 +256,26 @@ def add_new_batch(day_id, schedule_id, batch_date, start_time, end_time, max_tic
                 conn.commit()
                 return cur.rowcount
                 
-    
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    return 0
+
+def update_and_add_new_batch(day_id, schedule_id, batch_date, start_time, end_time, max_tickets):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"""
+                    INSERT INTO batches (day_id, schedule_id, batch_date, start_time, end_time, max_tickets)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (schedule_id, batch_date) DO UPDATE 
+                        SET start_time = EXCLUDED.start_time, end_time = EXCLUDED.end_time, max_tickets = EXCLUDED.max_tickets
+                """, (day_id, schedule_id, batch_date, start_time, end_time, max_tickets))
+
+                conn.commit()
+                return cur.rowcount
+                
     except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
         raise Exception(f"Database error: {e}")
     except Exception as e:

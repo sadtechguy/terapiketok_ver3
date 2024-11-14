@@ -7,7 +7,7 @@ from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMess
 from ..services.data_processing import format_date_str, format_default_batch_time, get_queue_number
 from terapiketok import app, bcrypt, db
 
-from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date, add_customer_manually, fetct_queue_number, fetch_available_date_to_edit
+from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date, add_customer_manually, fetct_queue_number, fetch_available_date_to_edit, update_and_add_new_batch
 
 boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/boardpanel")
 
@@ -172,8 +172,65 @@ def editoption_page(action):
 
 @boardpanel_bp.route('/edit', methods=['GET', 'POST'])
 @login_required
-def edit_page(action):
-    next_action = "delete"
+def edit_page():
+    form = MultipleBatchesForm()
+
+    batch_date = request.args.get('batch_date')
+    num_batch = int(request.args.get('num_batch'))
+    day_id = request.args.get('day_id')
+
+    batches = Batches.query.filter_by(batch_date=batch_date).order_by(Batches.batch_date.asc(), Batches.schedule_id.asc()).all()
+
+
+    if form.validate_on_submit():
+        def get_day_id(date_str):
+            day_num = datetime.datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z").weekday()
+            day_data = Workingdays.query.filter_by(day_num=day_num).first()
+            return day_data.day_id
+        
+
+        for index, batch_form in enumerate(form.batches):
+            schedule_id = index+1
+            batch_date = batch_date
+            start_time = batch_form.start_time.data
+            end_time = batch_form.end_time.data
+            max_tickets = batch_form.capacity.data
+            day_id = day_id
+
+            count = update_and_add_new_batch(day_id, schedule_id, batch_date, start_time, end_time, max_tickets)
+            if count > 0:
+                flash(f"Add New Date on {batch_date}", category="success")    
+            else:
+                flash("Failed to updated", category="warning")
+
+        return redirect(url_for('boardpanel.boardpanel_page'))
+
+    for batch in batches:
+        batch_form = NewBatchForm(
+            start_time = batch.start_time,
+            end_time = batch.end_time,
+            capacity = batch.max_tickets
+        )
+        form.batches.append_entry(batch_form.data)
+    
+    if num_batch > len(batches):
+        default_set = Default_batch.query.filter_by(default_batch_id=1).first()
+        
+        for num in range(len(batches), num_batch):
+            cur_batch_attr_start =f"batch{num+1}_start"
+            cur_batch_attr_end =f"batch{num+1}_end"
+            start_time = getattr(default_set, cur_batch_attr_start, datetime.time(0, 0))
+            end_time = getattr(default_set, cur_batch_attr_end, datetime.time(0, 0))
+            
+            batch_form = NewBatchForm(
+                start_time = start_time,
+                end_time = end_time,
+                capacity = default_set.capacity
+            )
+            form.batches.append_entry(batch_form.data)
+
+
+    return render_template('edit.html', form=form, batches=batches, new_date=batch_date, enumerate=enumerate, num_batch=num_batch, day_id=day_id)
 
 @boardpanel_bp.route('/batchdetail/<batch_id>', methods=['GET', 'POST'])
 @login_required
