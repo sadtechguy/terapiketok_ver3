@@ -3,11 +3,12 @@ from flask import Blueprint, render_template_string, render_template, request, r
 from flask_login import login_user, LoginManager, login_required, logout_user,current_user
 from flask_bcrypt import Bcrypt
 from ..models import Adminuser, Default_batch, Opening_message, Workingdays, Batches, Booking_tickets
-from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm, ChangeStatusForm, AddCustomerManualForm, CloseTicketButton
+from ..forms import RegisterForm, LoginAdminForm, DefaultBatchForm2, OpeningMessageForm, NewBatchForm, MultipleBatchesForm, NewDateForm, ChangeStatusForm, AddCustomerManualForm, CloseTicketButton, DeleteBatchesForm, MultipleDeleteForm, ConfirmDeleteForm
 from ..services.data_processing import format_date_str, format_default_batch_time, get_queue_number
 from terapiketok import app, bcrypt, db
 
-from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date, add_customer_manually, fetct_queue_number, fetch_available_date_to_edit, update_and_add_new_batch, fetch_max_shifts, delete_batch_by_date_scheduleid
+from ..services.database import add_default_batch, update_default_batch, update_default_batch2, update_opening_message, add_new_batch, update_batch_status_by_batch, update_batch_status_by_date, add_customer_manually, fetct_queue_number, fetch_available_date_to_edit, update_and_add_new_batch, fetch_max_shifts, delete_batch_by_date_scheduleid, delete_batch_by_id
+from ..services.database_renew import DatabaseProcess
 
 boardpanel_bp = Blueprint('boardpanel', __name__, template_folder="../templates/boardpanel")
 
@@ -166,7 +167,8 @@ def editoption_page(action):
     if action == "delete":
         next_action = "edit"
     today = datetime.date.today()
-    dates_to_edit = fetch_available_date_to_edit(today)
+    start_date = datetime.date(year=2024, month=1, day=1)
+    dates_to_edit = fetch_available_date_to_edit(start_date)
 
     return render_template('editoption.html', head_text=action, next_action=next_action, dates=dates_to_edit)
 
@@ -241,6 +243,83 @@ def edit_page():
             form.batches.pop_entry()
 
     return render_template('edit.html', form=form, batches=batches, new_date=batch_date, enumerate=enumerate, num_batch=num_batch, day_id=day_id)
+
+@boardpanel_bp.route('/delete', methods=['GET', 'POST'])
+@login_required
+def delete_page():
+
+    batch_date_str = request.args.get('batch_date')
+    batch_date = datetime.datetime.strptime(batch_date_str, "%Y-%m-%d")
+    num_batch = int(request.args.get('num_batch'))
+    day_ina_name = request.args.get('day_ina_name')
+    default_check = request.args.get('default_check')
+    
+    batches = Batches.query.filter_by(batch_date=batch_date).order_by(Batches.batch_date.asc(), Batches.schedule_id.asc()).all()
+    
+    form = MultipleDeleteForm()
+
+    if form.validate_on_submit():
+        batchid_with_tickets = []
+        for batch_form in form.batches:
+            if batch_form.batch_checkboxes.data:
+                try:
+                    # result = delete_batch_by_id(batch_form.fixed_value.data)
+                    batch_id = batch_form.fixed_value.data
+                    dp = DatabaseProcess()
+                    result = dp.delete_batch_by_id(batch_id)
+                    if result == 0:
+                        flash(f"Success delete batchID {batch_id} in date {batch_date}", category="success")
+                    elif result > 0:
+                        batchid_with_tickets.append(batch_id)
+                    else:
+                        flash(f"FAILED delete batchID {batch_id} in date {batch_date}", category="warning")
+                except Exception as e:
+                    flash(f"DELETE failed: {e}", category="danger")
+        
+        if len(batchid_with_tickets) > 0:
+            batch_ids_str = ','.join(map(str, batchid_with_tickets)) # can not send a list
+            
+            return redirect(url_for('boardpanel.confirm_delete_batch_with_tickets', batch_ids_str=batch_ids_str))
+        return redirect(url_for('.boardpanel_page'))
+
+    options = []
+    for batch in batches:
+        batch_form = DeleteBatchesForm()
+        if default_check == 'True':
+            # Set the default value of the checkbox to True
+            batch_form.batch_checkboxes.data = True
+        options.append((batch.batch_id, f"shift-{batch.schedule_id}", batch.start_time, batch.end_time, batch.current_tickets, batch.max_tickets, batch.status))
+        form.batches.append_entry(batch_form.data)
+    
+    return render_template('delete.html', form=form, options=options, batches=batches, batch_date=batch_date, num_batch=num_batch, day_ina_name=day_ina_name, enumerate=enumerate)
+
+@boardpanel_bp.route('/deletecorfirmation', methods=['GET', 'POST'])
+@login_required
+def confirm_delete_batch_with_tickets():
+    batch_ids_str = request.args.get('batch_ids_str')
+    batch_ids = batch_ids_str.split(',')
+    curr_batch_id = batch_ids.pop(0)
+    curr_batch_info = Batches.query.filter_by(batch_id=curr_batch_id).first()
+
+    form = ConfirmDeleteForm()
+
+    if form.validate_on_submit():
+        if form.confirm.data:
+
+            dp = DatabaseProcess()
+            result = dp.delete_batch_by_id_with_tickets(curr_batch_id)
+            if result:
+                flash(f"Success delete shift-{curr_batch_info.schedule_id} and {curr_batch_info.current_tickets} tickets", category="success")
+            else:
+                flash(f"Failed delete batchID {curr_batch_id}", category="warning")
+            
+            if len(batch_ids) > 0:
+                batch_ids_str = ','.join(map(str, batch_ids))
+                return redirect(url_for('boardpanel.confirm_delete_batch_with_tickets', batch_ids_str=batch_ids_str))
+            else:
+                return redirect(url_for('.boardpanel_page'))
+    
+    return render_template('confirm_delete_batch.html', form=form, batch_id=curr_batch_id, shift=curr_batch_info.schedule_id, tickets=curr_batch_info.current_tickets)
 
 @boardpanel_bp.route('/batchdetail/<batch_id>', methods=['GET', 'POST'])
 @login_required

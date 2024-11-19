@@ -364,5 +364,28 @@ def delete_batch_by_date_scheduleid(batch_date, schedule_id):
     except Exception as e:
         raise Exception(f"Unknown error: {e}")
     return False
+
+def delete_batch_by_id(batch_id):
+    try:
+        with psycopg2.connect(conn_string) as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"""
+                    DELETE FROM batches
+                    WHERE batch_id = %s
+                """, (batch_id,))
+
+                conn.commit()
+                return True
+    except psycopg2.IntegrityError as e:
+        if "booking_tickets_batch_id_fkey" in str(e):  # Check for specific constraint
+            print("There are data customer in this batch")
+        else: 
+            print("something wrong")
+    except (psycopg2.OperationalError, psycopg2.ProgrammingError) as e:
+        raise Exception(f"Database error: {e}")
+    except Exception as e:
+        raise Exception(f"Unknown error: {e}")
+    return False
+
     
 

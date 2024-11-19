@@ -1,0 +1,53 @@
+{% extends 'baseboardpanel.html' %}
+
+{% block content %}
+    <h2 class="fs-5">Delete</h2>
+    <div class="d-flex flex-column">
+        <div class="row"><div class="col-3">Tanggal</div>: {{ batch_date.strftime('%d-%b-%Y') }}</div>
+        <div class="row"><div class="col-3">Hari</div>: {{ day_ina_name }}</div>
+        <div class="row"><div class="col-3">Jumlah Shift</div>: {{ num_batch }}</div>
+    </div>
+    <div class="d-flex mt-3">
+        <a href="{{ url_for('boardpanel.delete_page', batch_date=batch_date.strftime('%Y-%m-%d'), num_batch=num_batch, day_ina_name=day_ina_name, default_check=True) }}">
+            <div class="form-check">
+                
+                <label class="form-check-label" for="flexCheckDefault">
+                  Check All
+                </label>
+              </div>
+        </a>
+    </div>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <table class="table">
+            <thead>
+                <tr>
+                  <th scope="col">del</th>
+                  <th scope="col">shift</th>
+                  <th scope="col">jadwal</th>
+                  <th scope="col">tickets</th>
+                  <th scope="col">status</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                  {% for index, batch_form in enumerate(form.batches) %}
+                  <tr>
+                    {{ batch_form.hidden_tag() }}
+                    <th scope="row">{{ batch_form.batch_checkboxes() }}</th>
+                    <td>{{ options[index][1] }}</td>
+                    <td>{{ options[index][2].strftime('%H:%M') }}-{{ options[index][3].strftime('%H:%M') }}</td>
+                    <td>{{ options[index][4] }}/{{ options[index][5] }}</td>
+                    <td>{{ options[index][6] }}</td>
+                    <td>{{ batch_form.fixed_value(value=options[index][0], class="form-control visually-hidden") }}</td>
+                  </tr>
+                      
+                  {% endfor %}
+
+              </tbody>
+
+        </table>
+        {{ form.submit(class="btn btn-success p-2") }}
+        
+    </form>
+{% endblock %}

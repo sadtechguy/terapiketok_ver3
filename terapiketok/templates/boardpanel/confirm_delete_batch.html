@@ -1,0 +1,14 @@
+{% extends 'baseboardpanel.html' %}
+
+{% block content %}
+    <h2 class="fs-4">Confirm Batch Deletion</h2>
+    <p>Deleting this <span class="fw-bold">shift-{{ shift }}</span> will also delete <span class="fw-bold">{{ tickets }} booking tickets</span> associated with it. Are you sure you want to proceed?</p>
+    <form method="POST" class="mb-5">
+        {{ form.hidden_tag() }}
+        Check if you sure to delete
+        <div class="d-flex">
+            {{ form.confirm(class="m-2") }}
+            {{ form.submit }}
+        </div>
+    </form>
+{% endblock %}

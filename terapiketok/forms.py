@@ -90,4 +90,17 @@ class ChangeStatusForm(FlaskForm):
         ('closed', 'closed'),
     ])
     submit = SubmitField('Submit')
+
+
+class DeleteBatchesForm(FlaskForm):
+    batch_checkboxes = BooleanField('Delete', default=False)
+    fixed_value = StringField(render_kw={'readonly': True})
+    
+class MultipleDeleteForm(FlaskForm):
+    batches = FieldList(FormField(DeleteBatchesForm), min_entries=0)
+    submit = SubmitField(label='Delete')
+
+class ConfirmDeleteForm(FlaskForm):
+    confirm = BooleanField('Confirm Deletion', default=False)
+    submit = SubmitField('Delete')
     
